@@ -409,7 +409,7 @@ const Header = () => {
               ================================================= */}
               <div className="shrink-0 border-t border-[#063F3D]/10 bg-white px-5 py-5">
                 {/* Quote Button */}
-                <motion.button
+                {/* <motion.button
                   type="button"
                   whileTap={{ scale: 0.98 }}
                   onClick={handleQuote}
@@ -417,10 +417,10 @@ const Header = () => {
                 >
                   Get a Quote
                   <FiArrowUpRight size={18} />
-                </motion.button>
+                </motion.button> */}
 
                 {/* Social */}
-                <div className="mt-5 flex items-center justify-between">
+                <div className="space-y-4">
                   <p className="font-montserrat text-[10px] font-semibold uppercase tracking-[0.15em] text-black/40">
                     Follow Strap World
                   </p>
