@@ -1,7 +1,7 @@
 export const menuData = [
   { title: "Products", link: "/products" },
   { title: "Applicatons", link: "/pet-strap-applicatons" },
-  { title: "Blog", link: "#" },
+  { title: "Blog", link: "/blogs" },
   { title: "Gallery", link: "/gallery" },
   { title: "About Us", link: "/about-us" },
   { title: "Contact", link: "/contact" },
@@ -13,7 +13,7 @@ export const footerColumns = [
     links: [
       { name: "About Us", path: "/about-us" },
       { name: "Manufacturing", path: "/pet-strap-manufacturing" },
-      { name: "Blogs", path: "#" },
+      { name: "Blogs", path: "/blogs" },
       { name: "Contact", path: "contact" },
       { name: "Site Map", path: "sitemap" },
     ],

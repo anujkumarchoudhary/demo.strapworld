@@ -3,43 +3,6 @@ import Product from "../model/product.model";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 // CREATE PRODUCT
-// export const createProduct = async (req: Request, res: Response) => {
-//   try {
-//     // Check image
-//     if (!req.file) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Product image is required",
-//       });
-//     }
-
-//     // Upload image to Cloudinary
-//     const uploadedImage = await uploadToCloudinary(
-//       req.file.buffer,
-//       "strapworld/products",
-//     );
-
-//     // Add Cloudinary image information
-//     req.body.image = uploadedImage.secure_url;
-//     req.body.imagePublicId = uploadedImage.public_id;
-
-//     // Create product
-//     const product = await Product.create(req.body);
-
-//     return res.status(201).json({
-//       success: true,
-//       message: "Product created successfully",
-//       data: product,
-//     });
-//   } catch (error: any) {
-//     console.error("Create product error:", error);
-
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message || "Failed to create product",
-//     });
-//   }
-// };
 
 export const createProduct = async (req: Request, res: Response) => {
   try {

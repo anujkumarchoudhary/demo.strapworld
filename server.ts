@@ -4,7 +4,8 @@ import express from "express";
 import next from "next";
 import cors from "cors";
 import { connectDB } from "./backend/config/database";
-import productrRoutes from "./backend/routes/product.routes";
+import productRoutes from "./backend/routes/product.routes";
+import blogRoutes from "./backend/routes/blog.routes";
 // import errorMiddleware from "./server/middleware/error.middleware";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -57,7 +58,8 @@ const startServer = async () => {
       }),
     );
 
-    app.use(`${Base}products`, productrRoutes);
+    app.use(`${Base}products`, productRoutes);
+    app.use(`${Base}blogs`, blogRoutes);
 
     // =========================
     // Health Check
