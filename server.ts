@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
 import next from "next";
 import cors from "cors";
-import {connectDB} from "./backend/config/database";
+import { connectDB } from "./backend/config/database";
 import productrRoutes from "./backend/routes/product.routes";
 // import errorMiddleware from "./server/middleware/error.middleware";
 
@@ -14,9 +14,9 @@ const hostname = "0.0.0.0";
 const port = Number(process.env.PORT) || 4000;
 
 const nextApp = next({
-    dev,
-    hostname,
-    port,
+  dev,
+  hostname,
+  port,
 });
 
 console.log("Cloudinary config:", {
@@ -27,74 +27,76 @@ console.log("Cloudinary config:", {
 
 const handle = nextApp.getRequestHandler();
 
+const Base = "/api/v1/";
+
 const startServer = async () => {
-    try {
-        await connectDB();
+  try {
+    await connectDB();
 
-        await nextApp.prepare();
+    await nextApp.prepare();
 
-        const app = express();
+    const app = express();
 
-        // =========================
-        // Middleware
-        // =========================
+    // =========================
+    // Middleware
+    // =========================
 
-        app.use(
-            cors({
-                origin: true,
-                credentials: true,
-            })
-        );
+    app.use(
+      cors({
+        origin: true,
+        credentials: true,
+      }),
+    );
 
-        app.use(express.json({ limit: "10mb" }));
+    app.use(express.json({ limit: "10mb" }));
 
-        app.use(
-            express.urlencoded({
-                extended: true,
-                limit: "10mb",
-            })
-        );
+    app.use(
+      express.urlencoded({
+        extended: true,
+        limit: "10mb",
+      }),
+    );
 
-        app.use("/products", productrRoutes)
+    app.use(`${Base}products`, productrRoutes);
 
-        // =========================
-        // Health Check
-        // =========================
+    // =========================
+    // Health Check
+    // =========================
 
-        app.get("/health", (req, res) => {
-            res.status(200).json({
-                success: true,
-                message: "Server is running",
-                environment: process.env.NODE_ENV,
-            });
-        });
+    app.get(`${Base}health`, (req, res) => {
+      res.status(200).json({
+        success: true,
+        message: "Server is running",
+        environment: process.env.NODE_ENV,
+      });
+    });
 
-        // =========================
-        // API Routes
-        // =========================
+    // =========================
+    // API Routes
+    // =========================
 
-        // app.use("/v1/api/users", userRoutes);
+    // app.use("/v1/api/users", userRoutes);
 
-        // =========================
-        // Error Middleware
-        // =========================
+    // =========================
+    // Error Middleware
+    // =========================
 
-        // app.use(errorMiddleware);
+    // app.use(errorMiddleware);
 
-        // =========================
-        // Next.js
-        // =========================
+    // =========================
+    // Next.js
+    // =========================
 
-        app.use((req, res) => {
-            return handle(req, res);
-        });
+    app.use((req, res) => {
+      return handle(req, res);
+    });
 
-        // =========================
-        // Start Server
-        // =========================
+    // =========================
+    // Start Server
+    // =========================
 
-        app.listen(port, hostname, () => {
-            console.log(`
+    app.listen(port, hostname, () => {
+      console.log(`
 ========================================
 Server started successfully
 ========================================
@@ -114,12 +116,12 @@ http://localhost:${port}/health
 
 ========================================
       `);
-        });
-    } catch (error) {
-        console.error("Server startup failed:", error);
+    });
+  } catch (error) {
+    console.error("Server startup failed:", error);
 
-        process.exit(1);
-    }
+    process.exit(1);
+  }
 };
 
 startServer();

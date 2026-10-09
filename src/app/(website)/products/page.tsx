@@ -1,108 +1,168 @@
-export const dynamic = "force-dynamic";
+"use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
 import Banner from "@/src/components/common/Banner";
 import OurProducts from "@/src/components/OurProducts";
 import FinalCTA from "@/src/components/FinalCTA";
 import FAQ from "@/src/components/FAQ";
-import IndustriesWeServe from "@/src/components/IndustriesWeServe";
 import ManufactureProcess from "@/src/components/ManufactureProcess";
-import ChooseRight from "@/src/components/ChooseRight";
-import TechnicalPerformance from "@/src/components/TechnicalPerformance";
-
-import data from "./data.json";
-import type { Metadata } from "next";
-import { BaseUrl } from "../../baseurl";
 import WhyChooseUs from "@/src/components/WhyChooseUs";
 import Applications from "@/src/components/Applications";
 
-export const metadata: Metadata = {
-  title: "PET Straps & PET Strapping Products | Strap World",
-  description:
-    "Explore Strap World's range of PET straps and PET strapping products for industrial packaging, bundling and load securing. Manufactured in India for domestic and export requirements.",
-  keywords: [
-    "PET straps",
-    "PET strapping",
-    "PET strap products",
-    "PET strapping products",
-    "PET packing straps",
-    "PET strap manufacturer",
-    "PET strap manufacturers in India",
-    "PET strapping manufacturer India",
-    "industrial PET straps",
-    "packaging straps",
-    "PET packing strap",
-    "PET strapping band",
-  ],
-};
+import data from "./data.json";
 
-async function getService(): Promise<any[]> {
-  try {
-    const response = await fetch(`${BaseUrl}products/`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      console.error(
-        `Failed to fetch products: ${response.status} ${response.statusText}`
-      );
-      return [];
-    }
-
-    const result = await response.json();
-
-    return Array.isArray(result?.data) ? result.data : [];
-  } catch (error) {
-    console.error("Get service error:", error);
-    return [];
-  }
+interface Product {
+  _id?: string;
+  title: string;
+  description?: string;
+  button?: string;
+  slug?: string;
+  href?: string;
+  image?: string;
+  labels?: string[];
+  [key: string]: any;
 }
 
-const page = async () => {
-  const products = await getService();
+interface ProductsApiResponse {
+  data?: Product[];
+}
+
+const Page = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const getProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await axios.get<
+          Product[] | ProductsApiResponse
+        >("https://strapworld-backend.onrender.com/api/products");
+
+        const result = response.data;
+
+        console.log("Products API response:", result);
+
+        let productList: Product[] = [];
+
+        if (Array.isArray(result)) {
+          productList = result;
+        } else if (Array.isArray(result?.data)) {
+          productList = result.data;
+        } else {
+          console.error(
+            "Unexpected products API response:",
+            result
+          );
+        }
+
+        if (isMounted) {
+          setProducts(productList);
+        }
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+
+        if (isMounted) {
+          setProducts([]);
+          setError(
+            "Unable to load products right now. Please try again later."
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    getProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const {
     banner,
     ourProducts,
-    chooseRight,
-    industriesWeServe,
-    whyChoose,
     bulkAndCustomOrders,
     finalCTA,
   } = data;
 
-  const {
-    headingParts,
-    label,
-    description,
-    bgColor,
-  } = ourProducts;
-
   const productsData = {
-    bgColor,
-    headingParts,
-    label,
-    list: products.slice(2, 8),
-    description,
+    ...ourProducts,
+    list: products,
+    label: "OUR PRODUCTS",
+    textColor: "#000000",
+    bgColor: "#F5F7F2",
+    href: "products",
+    headingParts: [
+      {
+        text: "PET Strapping Products",
+        color: "#000000",
+        style: "normal",
+        weight: "500",
+      },
+    ],
+    description:
+      "Explore our range of PET strapping products designed for secure packaging.",
   };
 
   return (
-    <div>
+    <main>
+      {/* Homepage Banner */}
       <Banner data={banner} />
 
-      <OurProducts data={ourProducts} />
+      {/* Products Section */}
+      {loading ? (
+        <section className="bg-[#F5F7F2] px-4 py-16">
+          <div className="mx-auto max-w-7xl text-center">
+            <p className="text-base text-gray-600">
+              Loading products...
+            </p>
+          </div>
+        </section>
+      ) : error ? (
+        <section className="bg-[#F5F7F2] px-4 py-16">
+          <div className="mx-auto max-w-7xl text-center">
+            <p className="text-base text-red-600">{error}</p>
 
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-4 rounded-md bg-black px-5 py-2 text-white transition hover:bg-gray-800"
+            >
+              Try Again
+            </button>
+          </div>
+        </section>
+      ) : (
+        <OurProducts data={productsData} />
+      )}
+
+      {/* Applications Section */}
       <Applications />
 
+      {/* Why Choose Us Section */}
       <WhyChooseUs />
 
+      {/* Manufacturing Process Section */}
       <ManufactureProcess data={bulkAndCustomOrders} />
 
+      {/* Frequently Asked Questions */}
       <FAQ />
 
+      {/* Final Call To Action */}
       <FinalCTA data={finalCTA} />
-    </div>
+    </main>
   );
 };
 
-export default page;
+export default Page;
