@@ -76,11 +76,13 @@ const Home = () => {
         faqData,
     } = staticData.home;
 
-    const {
-        headingParts,
-        label,
-        description,
-    } = ourProducts;
+    // const {
+    //     headingParts,
+    //     label,
+    //     description,
+    // } = ourProducts;
+
+    console.log(ourProducts,products, "ourProducts232")
 
     const productsData = {
         list: products,
@@ -107,7 +109,7 @@ const Home = () => {
 
             <KayStatas data={keyStats} />
 
-            <OurProducts data={productsData} />
+            <OurProducts data={ourProducts} />
 
             <OurQuality />
 

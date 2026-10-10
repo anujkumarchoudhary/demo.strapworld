@@ -318,7 +318,7 @@ export default function FinalCTA({ data }: any) {
               />
               <div className="hidden lg:flex gap-3">
                 <a
-                  href="mailto:sales@starpworld.com"
+                  href="mailto:nalandaindustri@gmail.com"
                   className="flex gap-2"
                 >
                   <MdOutlineMailOutline
@@ -326,7 +326,7 @@ export default function FinalCTA({ data }: any) {
                     className="my-auto text-[#FFFFFF]"
                   />
                   <p className="my-auto text-[14px] font-bold text-[#FFFFFF]">
-                    sales@starpworld.com
+                    nalandaindustri@gmail.com
                   </p>
                 </a>
 

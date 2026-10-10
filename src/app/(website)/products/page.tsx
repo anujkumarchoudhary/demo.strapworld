@@ -71,24 +71,24 @@ const Page = () => {
     finalCTA,
   } = data;
 
-  const productsData = {
-    ...ourProducts,
-    list: products,
-    label: "OUR PRODUCTS",
-    textColor: "#000000",
-    bgColor: "#F5F7F2",
-    href: "/pet-strap-manufacturing",
-    headingParts: [
-      {
-        text: "PET Strapping Products",
-        color: "#000000",
-        style: "normal",
-        weight: "500",
-      },
-    ],
-    description:
-      "Explore our range of PET strapping products designed for secure packaging.",
-  };
+  // const productsData = {
+  //   // ...ourProducts,
+  //   list: products,
+  //   label: "OUR PRODUCTS",
+  //   textColor: "#000000",
+  //   bgColor: "#F5F7F2",
+  //   href: "/pet-strap-manufacturing",
+  //   headingParts: [
+  //     {
+  //       text: "PET Strapping Products",
+  //       color: "#000000",
+  //       style: "normal",
+  //       weight: "500",
+  //     },
+  //   ],
+  //   description:
+  //     "Explore our range of PET strapping products designed for secure packaging.",
+  // };
 
   return (
     <main>
@@ -96,7 +96,7 @@ const Page = () => {
       <Banner data={banner} />
 
       {/* Products Section */}
-      {loading ? (
+      {/* {loading ? (
         <section className="bg-[#F5F7F2] px-4 py-16">
           <div className="mx-auto max-w-7xl text-center">
             <p className="text-base text-gray-600">
@@ -119,8 +119,10 @@ const Page = () => {
           </div>
         </section>
       ) : (
-        <OurProducts data={productsData} />
-      )}
+      )} */}
+
+              <OurProducts data={ourProducts} />
+
 
       {/* Applications Section */}
       <Applications />
