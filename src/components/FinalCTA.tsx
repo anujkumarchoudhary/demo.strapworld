@@ -6,13 +6,15 @@ import Icon from "@/src/utills/iconMap ";
 import { ChangeEvent, FormEvent, useState } from "react";
 import GetEnquiryForm from "./form/GetEnquiryForm";
 import Heading from "./common/Heading";
-import { MdCheck, MdOutlineMailOutline, MdPhone } from "react-icons/md";
+import { MdArrowOutward, MdCheck, MdOutlineMailOutline, MdPhone } from "react-icons/md";
 import { useResponsive } from "../hooks/useResponsive";
 import SaveAndCancel from "./common/SaveAndCancel";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { AlertCircle, CheckCircle2, LoaderCircle } from "lucide-react";
+import { BaseUrl } from "../app/baseurl";
 
 interface FinalCTAData {
   label: string;
@@ -30,9 +32,7 @@ export default function FinalCTA({ data }: any) {
   const [open, setOpen] = useState(false);
   const { isDesktop, isMobile } = useResponsive()
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -42,8 +42,15 @@ export default function FinalCTA({ data }: any) {
     agree: false,
   });
 
+  const [status, setStatus] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
 
@@ -51,27 +58,27 @@ export default function FinalCTA({ data }: any) {
       ...prev,
       [name]: value,
     }));
+
+    if (status) setStatus(null);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-    if (!API_URL) {
+    if (!BaseUrl) {
       toast.error("API URL is not configured.");
       return;
     }
 
     if (!formData.agree) {
-      toast.error("Please accept the consent checkbox before submitting.");
+      toast.error("Please agree before submitting your enquiry.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const message = [
+      const finalMessage = [
         formData.company.trim()
           ? `Company: ${formData.company.trim()}`
           : "",
@@ -81,12 +88,12 @@ export default function FinalCTA({ data }: any) {
         .join("\n\n");
 
       const response = await axios.post(
-        `${API_URL}/enquiries`,
+        `${BaseUrl.replace(/\/$/, "")}/enquiries`,
         {
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
-          message,
+          message: finalMessage,
           agree: formData.agree,
         }
       );
@@ -106,22 +113,29 @@ export default function FinalCTA({ data }: any) {
         });
 
         router.push("/thank-you");
+
       } else {
         toast.error(
-          response.data?.message || "Unable to submit your enquiry."
+          response.data?.message || "Failed to submit enquiry."
         );
       }
     } catch (error: unknown) {
-      const errorMessage = axios.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? error.response?.data?.message ||
         "Unable to submit your enquiry. Please try again."
         : "Something went wrong. Please try again.";
 
-      toast.error(errorMessage);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
+
+  const inputClass =
+    "w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-3 py-3.5 text-[15px] text-[#000000] outline-none placeholder:text-[#8A9490] transition focus:border-[#063F3D] focus:ring-2 focus:ring-[#063F3D]/10 disabled:opacity-60";
+
+  const labelClass =
+    "mb-1 block text-[15px] font-medium text-[#000000]";
 
   return (
     <section className=" bg-[#2E9B4F] py-10 md:py-12 lg:py-20" >
@@ -168,126 +182,183 @@ export default function FinalCTA({ data }: any) {
                 Tell us about your requirement.
               </h2>
 
-              <form onSubmit={handleSubmit} className="space-y-2.5">                {/* Name + Company */}
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Name + Company */}
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-[13px] font-medium text-[#101820]">
-                      Name
+                    <label htmlFor="name" className={labelClass}>
+                      Name <span className="text-[#000000]/80">*</span>
                     </label>
+
                     <input
+                      id="name"
                       name="name"
                       type="text"
+                      autoComplete="name"
                       placeholder="Your name"
                       value={formData.name}
                       onChange={handleChange}
+                      className={inputClass}
                       required
                       minLength={2}
                       maxLength={100}
                       disabled={loading}
-                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-[13px] font-medium text-[#101820]">
+                    <label htmlFor="company" className={labelClass}>
                       Company
                     </label>
+
                     <input
+                      id="company"
                       name="company"
                       type="text"
+                      autoComplete="organization"
                       placeholder="Company name"
                       value={formData.company}
                       onChange={handleChange}
+                      className={inputClass}
                       maxLength={150}
                       disabled={loading}
-                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
                 </div>
 
                 {/* Email + Phone */}
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-[13px] font-medium text-[#101820]">
-                      Email
+                    <label htmlFor="email" className={labelClass}>
+                      Email <span className="text-[#000000]/80">*</span>
                     </label>
+
                     <input
+                      id="email"
                       name="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="name@company.com"
                       value={formData.email}
                       onChange={handleChange}
+                      className={inputClass}
                       required
                       maxLength={254}
                       disabled={loading}
-                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-[13px] font-medium text-[#101820]">
-                      Phone
+                    <label htmlFor="phone" className={labelClass}>
+                      Phone <span className="text-[#000000]/80">*</span>
                     </label>
+
                     <input
+                      id="phone"
                       name="phone"
                       type="tel"
+                      autoComplete="tel"
                       placeholder="Phone number"
                       value={formData.phone}
                       onChange={handleChange}
+                      className={inputClass}
                       required
                       maxLength={30}
                       disabled={loading}
-                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
                 </div>
 
                 {/* Message */}
                 <div>
-                  <label className="mb-1 block text-[13px] font-medium text-[#101820]">
-                    Message
+                  <label htmlFor="message" className={labelClass}>
+                    Message <span className="text-[#000000]/80">*</span>
                   </label>
 
                   <textarea
+                    id="message"
                     name="message"
-                    rows={4}
-                    placeholder="Application, delivery location and any additional information"
+                    rows={5}
+                    placeholder="Tell us about your requirements, product specifications, quantity, delivery location, or any other details."
                     value={formData.message}
                     onChange={handleChange}
+                    className={`${inputClass} min-h-[130px] resize-y`}
                     required
                     minLength={5}
                     maxLength={5000}
                     disabled={loading}
-                    className="min-h-[56px] w-full resize-none rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-2 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                   />
                 </div>
 
-                <label className="flex cursor-pointer items-start gap-2 text-xs leading-5 text-[#101820]">
+                {/* Consent */}
+                <label className="flex cursor-pointer items-start gap-3 text-sm leading-6 text-white">
                   <input
                     type="checkbox"
+                    name="agree"
                     checked={formData.agree}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setFormData((prev) => ({
                         ...prev,
                         agree: e.target.checked,
-                      }))
-                    }
+                      }));
+
+                      if (status) setStatus(null);
+                    }}
+                    className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[#063F3D]"
                     required
                     disabled={loading}
-                    className="mt-1 h-4 w-4 shrink-0 accent-[#063F3D]"
                   />
 
-                  <span>
-                    I agree to be contacted regarding my enquiry and understand that
-                    my information will be used to respond to my request.
+                  <span className="text-[#000000]/70">
+                    I agree to be contacted regarding my enquiry and understand
+                    that my information will be used to respond to my request.
+                    <span className="ml-1 text-[#000000]/80">*</span>
                   </span>
                 </label>
 
-                {/* Button */}
-                <div className="flex justify-center lg:justify-start">
-                  <SaveAndCancel saveText={data?.button} saveBgColor="#063F3D" />
-                </div>
+                {/* Success / Error Message */}
+                {status && (
+                  <div
+                    role={status.type === "error" ? "alert" : "status"}
+                    aria-live="polite"
+                    className={`flex items-start gap-3 rounded-lg border p-4 text-sm ${status.type === "success"
+                      ? "border-white/30 bg-white/15 text-white"
+                      : "border-red-200 bg-white text-red-700"
+                      }`}
+                  >
+                    {status.type === "success" ? (
+                      <CheckCircle2
+                        size={20}
+                        className="mt-0.5 shrink-0"
+                      />
+                    ) : (
+                      <AlertCircle
+                        size={20}
+                        className="mt-0.5 shrink-0"
+                      />
+                    )}
 
+                    <p>{status.message}</p>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="group inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#063F3D] px-8 py-3.5 text-[clamp(12px,1vw,16px)] font-medium text-white transition-all duration-300 hover:bg-[#052F2D] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto sm:min-w-[180px]"
+                >
+                  <span>{loading ? "Submitting..." : "Submit Enquiry"}</span>
+
+                  {loading ? (
+                    <LoaderCircle size={18} className="animate-spin" />
+                  ) : (
+                    <MdArrowOutward
+                      size={20}
+                      className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
+                    />
+                  )}
+                </button>
               </form>
             </div>
           </div>

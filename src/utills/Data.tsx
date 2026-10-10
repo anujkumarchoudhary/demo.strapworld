@@ -4612,7 +4612,7 @@ export const staticData = {
         }
       ],
       button: "How we manufacture",
-      href: "/manufacturing",
+      href: "/pet-strap-manufacturing",
 
     },
     exportAndGlobalReach: {
