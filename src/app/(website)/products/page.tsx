@@ -12,6 +12,7 @@ import WhyChooseUs from "@/src/components/WhyChooseUs";
 import Applications from "@/src/components/Applications";
 
 import data from "./data.json";
+import { BaseUrl } from "../../baseurl";
 
 interface Product {
   _id?: string;
@@ -35,60 +36,34 @@ const Page = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-
     const getProducts = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
-        const response = await axios.get<
-          Product[] | ProductsApiResponse
-        >("https://strapworld-backend.onrender.com/api/products");
+        const response = await axios.get(
+          `${BaseUrl}/products`
+        );
 
         const result = response.data;
 
         console.log("Products API response:", result);
 
-        let productList: Product[] = [];
-
-        if (Array.isArray(result)) {
-          productList = result;
-        } else if (Array.isArray(result?.data)) {
-          productList = result.data;
+        if (Array.isArray(result?.data)) {
+          setProducts(result.data);
+        } else if (Array.isArray(result)) {
+          setProducts(result);
         } else {
-          console.error(
-            "Unexpected products API response:",
-            result
-          );
-        }
-
-        if (isMounted) {
-          setProducts(productList);
-        }
-      } catch (err) {
-        console.error("Failed to fetch products:", err);
-
-        if (isMounted) {
           setProducts([]);
-          setError(
-            "Unable to load products right now. Please try again later."
-          );
+          console.error("Unexpected products API response:", result);
         }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        setProducts([]);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     getProducts();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
-
   const {
     banner,
     ourProducts,
