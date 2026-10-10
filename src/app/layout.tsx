@@ -5,7 +5,7 @@ import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import SmoothScroll from "../components/layout/SmoothScroll";
 import ChatWidget from "../components/ChatWidget";
-
+import { Toaster } from "react-hot-toast";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -133,7 +133,9 @@ export default function RootLayout({
       >
         <Header />
         <main>
+
           <SmoothScroll />
+          <Toaster position="top-right" reverseOrder={false} />
 
           {children}
           <ChatWidget />

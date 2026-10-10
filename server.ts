@@ -6,6 +6,7 @@ import cors from "cors";
 import { connectDB } from "./backend/config/database";
 import productRoutes from "./backend/routes/product.routes";
 import blogRoutes from "./backend/routes/blog.routes";
+import enquirieRoutes from "./backend/routes/enquiry.routes";
 // import errorMiddleware from "./server/middleware/error.middleware";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -18,12 +19,6 @@ const nextApp = next({
   dev,
   hostname,
   port,
-});
-
-console.log("Cloudinary config:", {
-  cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-  apiKey: process.env.CLOUDINARY_API_KEY,
-  hasSecret: !!process.env.CLOUDINARY_API_SECRET,
 });
 
 const handle = nextApp.getRequestHandler();
@@ -60,6 +55,7 @@ const startServer = async () => {
 
     app.use(`${Base}products`, productRoutes);
     app.use(`${Base}blogs`, blogRoutes);
+    app.use(`${Base}enquiries`, enquirieRoutes);
 
     // =========================
     // Health Check

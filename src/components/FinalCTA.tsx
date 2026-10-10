@@ -3,13 +3,16 @@
 import { motion } from "framer-motion";
 import MaxWidth from "./layout/MaxWidth";
 import Icon from "@/src/utills/iconMap ";
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import GetEnquiryForm from "./form/GetEnquiryForm";
 import Heading from "./common/Heading";
 import { MdCheck, MdOutlineMailOutline, MdPhone } from "react-icons/md";
 import { useResponsive } from "../hooks/useResponsive";
 import SaveAndCancel from "./common/SaveAndCancel";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface FinalCTAData {
   label: string;
@@ -26,6 +29,100 @@ interface FinalCTAProps {
 export default function FinalCTA({ data }: any) {
   const [open, setOpen] = useState(false);
   const { isDesktop, isMobile } = useResponsive()
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    company: "",
+    email: "",
+    phone: "",
+    message: "",
+    agree: false,
+  });
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+    if (!API_URL) {
+      toast.error("API URL is not configured.");
+      return;
+    }
+
+    if (!formData.agree) {
+      toast.error("Please accept the consent checkbox before submitting.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const message = [
+        formData.company.trim()
+          ? `Company: ${formData.company.trim()}`
+          : "",
+        `Message: ${formData.message.trim()}`,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      const response = await axios.post(
+        `${API_URL}/enquiries`,
+        {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          message,
+          agree: formData.agree,
+        }
+      );
+
+      if (response.data?.success) {
+        toast.success(
+          response.data.message || "Enquiry submitted successfully!"
+        );
+
+        setFormData({
+          name: "",
+          company: "",
+          email: "",
+          phone: "",
+          message: "",
+          agree: false,
+        });
+
+        router.push("/thank-you");
+      } else {
+        toast.error(
+          response.data?.message || "Unable to submit your enquiry."
+        );
+      }
+    } catch (error: unknown) {
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message ||
+        "Unable to submit your enquiry. Please try again."
+        : "Something went wrong. Please try again.";
+
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className=" bg-[#2E9B4F] py-10 md:py-12 lg:py-20" >
       {data?.isVariant === "01" && <MaxWidth>
@@ -37,7 +134,7 @@ export default function FinalCTA({ data }: any) {
           className="relative overflow-hidden "
         >
           {/* Content */}
-          <div className="relative w-full mb-auto z-10 lg:grid grid-cols-1 lg:grid-cols-[35%_55%] justify-between gap-6 space-y-10 sm:px-10 md:px-16">
+          <div className="relative w-full mb-auto z-10 lg:grid grid-cols-1 lg:grid-cols-[35%_50%] justify-between gap-6 space-y-10 ">
             {/* Left */}
             <div className="space-y-5 ">
               <Heading
@@ -65,32 +162,29 @@ export default function FinalCTA({ data }: any) {
             </div>
 
             {/* Form */}
-            <div className="w-full  rounded-[14px] bg-white p-5 sm:p-10">
+            <div className="w-full   rounded-[14px] bg-white p-5 sm:p-10">
               {/* Heading */}
               <h2 className="mb-4 text-[clamp(18px,1.5vw,28px)] font-semibold leading-tight text-[#101820]">
                 Tell us about your requirement.
               </h2>
 
-              <form className="space-y-2.5">
-                {/* Name + Company */}
+              <form onSubmit={handleSubmit} className="space-y-2.5">                {/* Name + Company */}
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-[13px] font-medium text-[#101820]">
                       Name
                     </label>
                     <input
+                      name="name"
                       type="text"
                       placeholder="Your name"
-                      className="
-              py-3.5 w-full rounded-[5px]
-              border border-[#DCE3DF]
-              bg-[#F4F7F4]
-              px-2.5
-              text-[13px] text-[#101820]
-              outline-none
-              placeholder:text-[#8A9490]
-              focus:border-[#218B55]
-            "
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      minLength={2}
+                      maxLength={100}
+                      disabled={loading}
+                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
 
@@ -99,18 +193,14 @@ export default function FinalCTA({ data }: any) {
                       Company
                     </label>
                     <input
+                      name="company"
                       type="text"
                       placeholder="Company name"
-                      className="
-              py-3.5 w-full rounded-[5px]
-              border border-[#DCE3DF]
-              bg-[#F4F7F4]
-              px-2.5
-              text-[13px] text-[#101820]
-              outline-none
-              placeholder:text-[#8A9490]
-              focus:border-[#218B55]
-            "
+                      value={formData.company}
+                      onChange={handleChange}
+                      maxLength={150}
+                      disabled={loading}
+                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
                 </div>
@@ -122,18 +212,15 @@ export default function FinalCTA({ data }: any) {
                       Email
                     </label>
                     <input
+                      name="email"
                       type="email"
                       placeholder="name@company.com"
-                      className="
-              py-3.5 w-full rounded-[5px]
-              border border-[#DCE3DF]
-              bg-[#F4F7F4]
-              px-2.5
-              text-[13px] text-[#101820]
-              outline-none
-              placeholder:text-[#8A9490]
-              focus:border-[#218B55]
-            "
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      maxLength={254}
+                      disabled={loading}
+                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
 
@@ -142,86 +229,18 @@ export default function FinalCTA({ data }: any) {
                       Phone
                     </label>
                     <input
+                      name="phone"
                       type="tel"
                       placeholder="Phone number"
-                      className="
-              py-3.5 w-full rounded-[5px]
-              border border-[#DCE3DF]
-              bg-[#F4F7F4]
-              px-2.5
-              text-[13px] text-[#101820]
-              outline-none
-              placeholder:text-[#8A9490]
-              focus:border-[#218B55]
-            "
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                      maxLength={30}
+                      disabled={loading}
+                      className="w-full rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-3.5 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                     />
                   </div>
                 </div>
-
-                {/* Product + Quantity */}
-                {/* <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1 block text-[13px] font-medium text-[#101820]">
-                      Product
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="PET Strap"
-                      className="
-              py-3.5 w-full rounded-[5px]
-              border border-[#DCE3DF]
-              bg-[#F4F7F4]
-              px-2.5
-              text-[13px] text-[#101820]
-              outline-none
-              placeholder:text-[#8A9490]
-              focus:border-[#218B55]
-            "
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-[13px] font-medium text-[#101820]">
-                      Quantity
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Required quantity"
-                      className="
-              py-3.5 w-full rounded-[5px]
-              border border-[#DCE3DF]
-              bg-[#F4F7F4]
-              px-2.5
-              text-[13px] text-[#101820]
-              outline-none
-              placeholder:text-[#8A9490]
-              focus:border-[#218B55]
-            "
-                    />
-                  </div>
-                </div> */}
-
-                {/* Requirements */}
-                {/* <div>
-                  <label className="mb-1 block text-[13px] font-medium text-[#101820]">
-                    Requirements
-                  </label>
-
-                  <input
-                    type="text"
-                    placeholder="Width, thickness, strength, color or other details"
-                    className="
-            py-3.5 w-full rounded-[5px]
-            border border-[#DCE3DF]
-            bg-[#F4F7F4]
-            px-2.5
-            text-[13px] text-[#101820]
-            outline-none
-            placeholder:text-[#8A9490]
-            focus:border-[#218B55]
-          "
-                  />
-                </div> */}
 
                 {/* Message */}
                 <div>
@@ -230,25 +249,44 @@ export default function FinalCTA({ data }: any) {
                   </label>
 
                   <textarea
+                    name="message"
                     rows={4}
                     placeholder="Application, delivery location and any additional information"
-                    className="
-            min-h-[56px] w-full resize-none rounded-[5px]
-            border border-[#DCE3DF]
-            bg-[#F4F7F4]
-            px-2.5 py-2
-            text-[13px] text-[#101820]
-            outline-none
-            placeholder:text-[#8A9490]
-            focus:border-[#218B55]
-          "
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    minLength={5}
+                    maxLength={5000}
+                    disabled={loading}
+                    className="min-h-[56px] w-full resize-none rounded-[5px] border border-[#DCE3DF] bg-[#F4F7F4] px-2.5 py-2 text-[13px] text-[#101820] outline-none placeholder:text-[#8A9490] focus:border-[#218B55]"
                   />
                 </div>
 
+                <label className="flex cursor-pointer items-start gap-2 text-xs leading-5 text-[#101820]">
+                  <input
+                    type="checkbox"
+                    checked={formData.agree}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        agree: e.target.checked,
+                      }))
+                    }
+                    required
+                    disabled={loading}
+                    className="mt-1 h-4 w-4 shrink-0 accent-[#063F3D]"
+                  />
+
+                  <span>
+                    I agree to be contacted regarding my enquiry and understand that
+                    my information will be used to respond to my request.
+                  </span>
+                </label>
+
                 {/* Button */}
-               <div className="flex justify-center lg:justify-start">
-                 <SaveAndCancel saveText={data?.button} saveBgColor="#063F3D" />
-               </div>
+                <div className="flex justify-center lg:justify-start">
+                  <SaveAndCancel saveText={data?.button} saveBgColor="#063F3D" />
+                </div>
 
               </form>
             </div>
