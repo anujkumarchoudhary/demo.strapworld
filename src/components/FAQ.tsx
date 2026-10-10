@@ -78,7 +78,7 @@ const FAQ = ({ data }: any) => {
         {/* FAQ List */}
         <div className="mx-auto w-full md:w-[80%]">
           <div>
-            {faqData?.map((faq: any, index: number) => {
+            {data?.list?.map((faq: any, index: number) => {
               const isOpen = activeIndex === index;
 
               return (

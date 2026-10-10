@@ -140,18 +140,18 @@ export const staticData = {
           "labels": ["Smooth Finish", "Clean Packaging"]
         },
         {
-          "title": "PET Jumbo Roll",
+          "title": "PP Box Color Strap",
           "description": "High-volume roll for efficient packaging operations",
           "button": "View PET Jumbo Roll",
-          "href": "/pet-jumbo-roll",
+          "href": "/pp-box-color-strap",
           "image": "/images/products/image_12.webp",
           "labels": ["Jumbo Roll", "High Volume"]
         },
         {
-          "title": "PET Box Strap",
+          "title": "Plastic Box Strapping Roll",
           "description": "Reliable strapping for cartons and boxes",
           "button": "View PET Box Strap",
-          "href": "/pet-box-strap",
+          "href": "/plastic-box-strapping-roll",
           "image": "/images/products/images_4.jpg",
           "labels": ["Box Packaging", "Reliable"]
         },

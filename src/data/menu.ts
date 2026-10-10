@@ -26,7 +26,7 @@ export const footerColumns = [
       { name: "PP Straps", path: "/pp-strap" },
       {
         name: "PET Box Strap",
-        path: "/pet-box-strap",
+        path: "/plastic-box-strapping-roll",
       },
       { name: "Machine Grade PET Strap", path: "/machine_grade-pet-strap" },
       { name: "Custom PET Strap", path: "/custom-pet-strap" },

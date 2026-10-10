@@ -55,7 +55,7 @@ const SaveAndCancel = ({
           hover:shadow-purple-500/30
         "
       >
-        <span className="text-[#ffffff]">{saveText}</span>
+        {saveText}
 
         <MdArrowOutward size={18} className="text-[#ffffff]" />
       </button>}
@@ -87,7 +87,7 @@ const SaveAndCancel = ({
         hover:scale-[1.03]
       "
         >
-          <span>{cancelText}</span>
+         {cancelText}
           <MdArrowOutward size={18} />
         </button>
       )}
