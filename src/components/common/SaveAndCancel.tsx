@@ -46,7 +46,8 @@ const SaveAndCancel = ({
           gap-2
           whitespace-nowrap
           rounded-full
-          px-5 py-3
+          px-3
+          md:px-5 py-3
           text-[clamp(12px,1vw,16px)]
           font-medium
           transition-all
@@ -55,7 +56,7 @@ const SaveAndCancel = ({
           hover:shadow-purple-500/30
         "
       >
-        {saveText}
+        <span className="text-[#ffffff]">{saveText}</span>
 
         <MdArrowOutward size={18} className="text-[#ffffff]" />
       </button>}
@@ -76,7 +77,8 @@ const SaveAndCancel = ({
         rounded-full
         border border-[#29414E]
         bg-transparent
-        px-5 py-3
+        px-3
+          md:px-5 py-3
         text-[clamp(12px,1vw,14px)]
         font-semibold
         text-white
@@ -87,7 +89,7 @@ const SaveAndCancel = ({
         hover:scale-[1.03]
       "
         >
-         {cancelText}
+          <span>{cancelText}</span>
           <MdArrowOutward size={18} />
         </button>
       )}
