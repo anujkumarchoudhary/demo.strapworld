@@ -134,23 +134,29 @@ export const createProduct = async (req: Request, res: Response) => {
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const products = await Product.find()
+      .select(
+        "title description button image labels slug status createdAt relatedProducts productOverview technicalOverview faqData",
+      )
       .populate({
         path: "relatedProducts.productId",
         select: "title description button image labels slug",
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: products.length,
       data: products,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Get products error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: error.message || "Failed to fetch products",
+      message:
+        error instanceof Error ? error.message : "Failed to fetch products",
     });
   }
 };

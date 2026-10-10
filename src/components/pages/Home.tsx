@@ -18,6 +18,7 @@ import GlobalExport from "../GlobalExport";
 import WhyChooseUs from "../WhyChooseUs";
 import OurQuality from "../OurQuality";
 import Gallery from "../Gallery";
+import { BaseUrl } from "@/src/app/baseurl";
 
 interface Product {
     _id?: string;
@@ -38,7 +39,7 @@ const Home = () => {
         const getProducts = async () => {
             try {
                 const response = await axios.get(
-                    "https://strapworld-backend.onrender.com/api/products"
+                    `${BaseUrl}/products`
                 );
 
                 const result = response.data;

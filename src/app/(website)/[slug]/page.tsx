@@ -1,6 +1,4 @@
-export const dynamic = "force-dynamic";
-
-import type { Metadata } from "next";
+"use client";
 
 import ProductOverview from "@/src/components/ProductOverview";
 import TechnicalOverview from "@/src/components/TechnicalOverview";
@@ -10,14 +8,10 @@ import FAQ from "@/src/components/FAQ";
 
 import sData from "./StaticData.json";
 import { BaseUrl } from "../../baseurl";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-interface PageProps {
-  params: Promise<{
-    slug: string;
-  }>;
-}
-
-interface ServiceData {
+interface ProductData {
   title: string;
   slug: string;
   description?: string;
@@ -28,142 +22,73 @@ interface ServiceData {
   technicalOverview?: any;
   relatedProducts?: any;
   faqData?: any;
-  finalCTA?: any;
 
   status?: "active" | "inactive";
 }
 
-// --------------------------------------------------
-// GET PRODUCT
-// --------------------------------------------------
+const Page = () => {
+  const params = useParams<{ slug: string }>();
+  const slug = params.slug;
 
-async function getService(
-  slug: string
-): Promise<ServiceData | null> {
-  try {
-    const response = await fetch(
-      `${BaseUrl}products/${slug}`,
-      {
-        cache: "no-store",
+  const [productDetails, setProductDetails] =
+    useState<ProductData | null>(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const getProductDetails = async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(
+          `${BaseUrl}/products/${encodeURIComponent(slug)}`,
+          {
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          console.error(
+            `Failed to fetch product: ${response.status}`
+          );
+          setProductDetails(null);
+          return;
+        }
+
+        const result = await response.json();
+
+        const product = result?.data ?? null;
+
+        if (product?.status === "inactive") {
+          setProductDetails(null);
+          return;
+        }
+
+        setProductDetails(product);
+      } catch (error) {
+        console.error("Get product details error:", error);
+        setProductDetails(null);
+      } finally {
+        setLoading(false);
       }
-    );
-
-    if (!response.ok) {
-      console.error(
-        `Failed to fetch product: ${response.status} ${response.statusText}`
-      );
-
-      return null;
-    }
-
-    const result = await response.json();
-
-    return result?.data || null;
-  } catch (error) {
-    console.error("Get product error:", error);
-
-    return null;
-  }
-}
-
-// --------------------------------------------------
-// DYNAMIC SEO META
-// --------------------------------------------------
-
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-
-  const product = await getService(slug);
-
-  if (!product) {
-    return {
-      title: "Product Not Found | Strap World",
-      description:
-        "The requested product could not be found.",
-      robots: {
-        index: false,
-        follow: false,
-      },
     };
-  }
 
-  const title =
-    product.title || "Industrial Strapping Solutions";
-
-  const description =
-    product.description ||
-    product.banner?.description ||
-    `Explore ${title} from Strap World Pvt. Ltd., a manufacturer and supplier of industrial strapping solutions.`;
-
-  const image =
-    product.image ||
-    product.banner?.image ||
-    "/images/og-image.jpg";
-
-  return {
-    title: `${title} | Strap World`,
-
-    description,
-
-    keywords: [
-      title,
-      `${title} manufacturer`,
-      `${title} supplier`,
-      `${title} manufacturer India`,
-      `${title} supplier India`,
-      "industrial strapping",
-      "packaging straps",
-      "Strap World",
-    ],
-
-    alternates: {
-      canonical: `/${product.slug}`,
-    },
-
-    openGraph: {
-      title: `${title} | Strap World`,
-      description,
-      url: `/${product.slug}`,
-      siteName: "Strap World",
-      type: "website",
-      images: [
-        {
-          url: image,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
-    },
-
-    twitter: {
-      card: "summary_large_image",
-      title: `${title} | Strap World`,
-      description,
-      images: [image],
-    },
-
-    robots: {
-      index: true,
-      follow: true,
-    },
-  };
-}
-
-// --------------------------------------------------
-// PAGE
-// --------------------------------------------------
-
-const Page = async ({ params }: PageProps) => {
-  const { slug } = await params;
-
-  const product = await getService(slug);
+    getProductDetails();
+  }, [slug]);
 
   const { finalCTA } = sData || {};
 
-  if (!product) {
+  if (loading) {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center bg-white">
+        <p className="text-gray-500">Loading product details...</p>
+      </main>
+    );
+  }
+
+  if (!productDetails) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center bg-white">
         <div className="text-center">
@@ -185,12 +110,15 @@ const Page = async ({ params }: PageProps) => {
     relatedProducts,
     image,
     faqData,
-  } = product;
+  } = productDetails;
 
   return (
     <main>
       {productOverview && (
-        <ProductOverview data={productOverview} image={image}/>
+        <ProductOverview
+          data={productOverview}
+          image={image}
+        />
       )}
 
       {technicalOverview && (

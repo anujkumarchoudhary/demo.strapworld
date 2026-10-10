@@ -22,14 +22,14 @@ export const footerColumns = [
   {
     title: "PRODUCTS",
     links: [
-      { name: "PET Straps", path: "/pet-straps" },
-      { name: "PP Straps", path: "/pp-straps" },
+      { name: "PET Straps", path: "/pet-strap" },
+      { name: "PP Straps", path: "/pp-strap" },
       {
-        name: "Plastic Box Strapping Roll",
-        path: "/plastic_box-strapping-roll",
+        name: "PET Box Strap",
+        path: "/pet-box-strap",
       },
-      { name: "PP Box Color Strap", path: "/pp-box_color-strap" },
-      { name: "Polyester PET Strap", path: "/polyester-pet-strap" },
+      { name: "Machine Grade PET Strap", path: "/machine_grade-pet-strap" },
+      { name: "Custom PET Strap", path: "/custom-pet-strap" },
     ],
   },
   // {
