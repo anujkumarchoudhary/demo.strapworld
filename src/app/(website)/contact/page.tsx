@@ -53,14 +53,14 @@ Morbi Highway, Nr Khodiyar Temple,
 Kagdadi town, Rajkot - 360003.`,
   },
   {
+    icon: <FaHeadphonesSimple size={32} />,
+    title: "Phone",
+    description: "+91 997 873 5708",
+  },
+  {
     icon: <IoIosMailOpen size={32} />,
     title: "Email Us",
     description: "sales@strapworld.com",
-  },
-  {
-    icon: <FaHeadphonesSimple size={32} />,
-    title: "Working Hours",
-    description: "Monday - Friday, 9:00 AM - 6:00 PM",
   },
 ];
 

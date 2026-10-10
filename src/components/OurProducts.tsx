@@ -10,6 +10,7 @@ import React from "react";
 import SaveAndCancel from "./common/SaveAndCancel";
 import { useStaggerReveal } from "../hooks/useStaggerReveal";
 import ButtonLink from "./common/ButtonLink";
+import { usePathname } from "next/navigation";
 
 type Service = {
   title: string;
@@ -19,6 +20,9 @@ type Service = {
 };
 
 const OurProducts = ({ data }: any) => {
+  const path =usePathname()
+  // const {slug}=path
+  console.log(path,"slug234")
   const { headingParts, label, list, description } = data || {};
   const { isDesktop } = useResponsive();
   const {
@@ -56,7 +60,7 @@ const OurProducts = ({ data }: any) => {
             description={description}
           />
           <div className="hidden lg:flex gap-2 justify-end h-fit mt-auto">
-            
+
             <ButtonLink saveText={data?.button ?? "View all products"} btnColor="#063F3D" href={data?.href ?? "/content"} />
 
           </div>
@@ -83,7 +87,7 @@ const OurProducts = ({ data }: any) => {
 
               >
                 {/* image */}
-                <div className="relative w-full aspect-16/16">
+                <Link href={product?.slug} className="relative w-full aspect-16/16">
                   <Image
                     src={product?.image}
                     fill
@@ -93,29 +97,30 @@ const OurProducts = ({ data }: any) => {
               ease-out
               group-hover:scale-105"
                   />
-                </div>
+                </Link>
 
                 {/* Content */}
-                <div className="space-y-3 p-6">
-                  <div className="flex justify-between"><h3 className="text-center text-[20px] font-semibold tracking-[-0.01em] text-[#16161D] lg:text-left">
+                <div className="relative flex min-h-[160px] flex-col p-6">
+                  {/* Title */}
+                  <Link href={product?.slug} className="pr-12 text-[20px] font-semibold tracking-[-0.01em] text-[#16161D]">
                     {product?.title}
+                  </Link>
 
-                  </h3>
-                    <Link
-                      href={product?.slug ?? "#"}
-                      className="mt-auto flex h-fit cursor-pointer items-center justify-end gap-2 shrink-0"
-                    >
-                      <MdArrowBack
-                        size={40}
-                        className="my-auto rotate-180 text-[#39B972] bg-[w#063F3D] p-2 transition-all duration-300 rounded-full group-hover:translate-x-1"
-                      />
-                    </Link></div>
-                  <p className="text-[#000000]/80 text-[16px] text-left">
+                  {/* Arrow: top-right */}
+                  <Link
+                    href={product?.slug ?? "#"}
+                    className="group absolute right-4 top-4"
+                  >
+                    <MdArrowBack
+                      size={40}
+                      className="rotate-180 rounded-full bg-[#063F3D] p-2 text-[#39B972] transition-all duration-300 group-hover:translate-x-1"
+                    />
+                  </Link>
+
+                  {/* Description: bottom */}
+                  <p className="mt-auto pt-6 text-left text-[16px] text-black/80">
                     {product.description?.slice(0, 50)}
                   </p>
-
-                  {/* View */}
-
                 </div>
               </div>
             );

@@ -102,7 +102,7 @@ const Page = () => {
     label: "OUR PRODUCTS",
     textColor: "#000000",
     bgColor: "#F5F7F2",
-    href: "products",
+    href: "/pet-strap-manufacturing",
     headingParts: [
       {
         text: "PET Strapping Products",
