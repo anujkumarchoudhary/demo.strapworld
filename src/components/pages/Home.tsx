@@ -73,6 +73,7 @@ const Home = () => {
         manufactureProcess,
         blogs,
         finalCTA,
+        faqData,
     } = staticData.home;
 
     const {
@@ -124,7 +125,7 @@ const Home = () => {
 
             <Blog data={blogs} />
 
-            <FAQ />
+            <FAQ  data={faqData}/>
 
             <FinalCTA data={finalCTA} />
         </div>

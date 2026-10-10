@@ -415,7 +415,7 @@ const Header = () => {
                   onClick={handleQuote}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-[#063F3D] px-6 py-4 font-montserrat text-sm font-bold text-white transition-colors duration-300 hover:bg-[#39B972]"
                 >
-                  Get a Quote
+                  Request a Quote
                   <FiArrowUpRight size={18} />
                 </motion.button> */}
 

@@ -1,7 +1,7 @@
 import React from "react";
 import Banner from "@/src/components/common/Banner";
 import Blog from "@/src/components/Blog";
-import { staticData } from "@/src/utills/Data";
+import data from "./data.json";
 import OurProducts from "@/src/components/OurProducts";
 import FinalCTA from "@/src/components/FinalCTA";
 import FAQ from "@/src/components/FAQ";
@@ -102,35 +102,13 @@ const PetStrapApplications = async () => {
 
   const {
     banner,
-    keyStats,
-    ourProducts,
-    applications,
-    industriesWeServe,
-    manufactureProcess,
-    blogs,
-    exportAndGlobalReach,
     finalCTA,
-  } = staticData?.home;
-
-  const {
-    headingParts,
-    label,
-    description,
-  } = ourProducts;
-
-  const productsData = {
-    headingParts,
-    label,
-    list: products.slice(2, 7),
-    description,
-  };
+  } = data;
 
   return (
     <div>
       <Banner data={banner} />
-
       <Gallery />
-
       <FinalCTA data={finalCTA} />
     </div>
   );

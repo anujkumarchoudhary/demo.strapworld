@@ -406,7 +406,7 @@ export const staticData = {
         }
       ],
       button: "How we manufacture",
-      href:"/manufacturing",
+      href: "/manufacturing",
 
     },
     exportAndGlobalReach: {
@@ -482,7 +482,7 @@ export const staticData = {
             "Compare retention, recovery, handling and equipment fit before choosing a grade.",
           date: "Aug 28, 2026",
           readTime: "6 min read",
-          href: "/blog/building-modern-web-applications-that-scale",
+          href: "/blogs/building-modern-web-applications-that-scale",
         },
 
         {
@@ -494,7 +494,7 @@ export const staticData = {
             "A practical checklist covering load geometry, edges, transit, storage and joining.",
           date: "Aug 21, 2026",
           readTime: "5 min read",
-          href: "/blog/why-great-ui-ux-design-matters",
+          href: "/blogs/why-great-ui-ux-design-matters",
         },
 
         {
@@ -506,16 +506,67 @@ export const staticData = {
             "Understand tool setup, strap surface and maintenance factors that affect the joint.",
           date: "Aug 14, 2026",
           readTime: "7 min read",
-          href: "/blog/from-idea-to-product",
+          href: "/blogs/from-idea-to-product",
         },
       ],
+    },
+    "faqData": {
+      "label": "FAQ",
+      "headingParts": [
+        {
+          "text": "Frequently Asked Questions About ",
+          "color": "#111111",
+          "style": "normal",
+          "weight": "500"
+        },
+        {
+          "text": "Strap World",
+          "color": "#2E9B4F",
+          "style": "normal",
+          "weight": "700"
+        }
+      ],
+      "list": [
+        {
+          "question": "What products does Strap World manufacture?",
+          "answer": "Strap World manufactures PET straps, PP straps, polyester strapping, cotton bale straps, and other packaging strapping solutions for industrial and commercial applications."
+        },
+        {
+          "question": "What is the difference between PET strap and PP strap?",
+          "answer": "PET straps offer high strength for heavy-duty packaging, while PP straps are lightweight and suitable for cartons, boxes, and general packaging."
+        },
+        {
+          "question": "Which industries use Strap World's products?",
+          "answer": "Our strapping products serve packaging, textile, automotive, logistics, manufacturing, and other industries requiring reliable bundling and load-securing solutions."
+        },
+        {
+          "question": "Can I order strapping products in bulk?",
+          "answer": "Yes, Strap World caters to bulk requirements for businesses, distributors, manufacturers, and industrial customers. Contact our team to discuss your quantity and product specifications."
+        },
+        {
+          "question": "Does Strap World supply products internationally?",
+          "answer": "Strap World serves packaging requirements for domestic and international markets. Contact our team to discuss export availability, shipping, and destination-specific requirements."
+        },
+        {
+          "question": "How do I choose the right strapping product?",
+          "answer": "The right strap depends on your packaging application, load weight, strapping equipment, and required strength. Our team can help you select a suitable solution."
+        },
+        {
+          "question": "How can I request a quotation?",
+          "answer": "You can contact Strap World through our website inquiry form or contact details. Share your product requirements, quantity, and delivery location to request a quotation."
+        },
+        {
+          "question": "Why choose Strap World for packaging straps?",
+          "answer": "Strap World focuses on dependable strapping solutions, product quality, varied packaging applications, and customer support to meet diverse industrial packaging needs."
+        }
+      ]
     },
     "finalCTA": {
       "isVariant": "01",
       "label": "Start a conversation",
       "headingParts": [
         {
-          "text": "Get a Quote for PET Strap",
+          "text": "Request a Quote for PET Strap",
           "color": "#ffffff",
           "style": "normal",
           "weight": "500"

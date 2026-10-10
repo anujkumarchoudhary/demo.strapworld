@@ -38,7 +38,7 @@ const TechnicalOverview = ({ data }: any) => {
                             description={data?.description}
                             className="w-[90%]"
                         />
-                        <SaveAndCancel saveText={"Get a Quote"} saveBgColor="#000000" handleClick={() => setOpen(!open)} />
+                        <SaveAndCancel saveText={"Request a Quote"} saveBgColor="#000000" handleClick={() => setOpen(!open)} />
                     </div>
 
                     <div>

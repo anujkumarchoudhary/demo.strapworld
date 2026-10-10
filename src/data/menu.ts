@@ -28,8 +28,8 @@ export const footerColumns = [
         name: "PET Box Strap",
         path: "/plastic-box-strapping-roll",
       },
-      { name: "Machine Grade PET Strap", path: "/machine_grade-pet-strap" },
-      { name: "Custom PET Strap", path: "/custom-pet-strap" },
+      { name: "Industrial Packaging Strap", path: "/industrial-packaging-strap" },
+      { name: "Cotton Bale Strap", path: "/cotton-bale-strap" },
     ],
   },
   // {
