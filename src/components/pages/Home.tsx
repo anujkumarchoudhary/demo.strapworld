@@ -82,8 +82,6 @@ const Home = () => {
     //     description,
     // } = ourProducts;
 
-    console.log(ourProducts,products, "ourProducts232")
-
     const productsData = {
         list: products,
         label: "OUR PRODUCTS",
