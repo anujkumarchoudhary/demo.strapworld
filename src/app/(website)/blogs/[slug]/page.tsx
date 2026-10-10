@@ -8,15 +8,15 @@ import {
     Clock3,
     UserRound,
 } from "lucide-react";
+import { BaseUrl } from "@/src/app/baseurl";
 
-const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 interface BlogItem {
     _id: string;
     title: string;
     slug: string;
     excerpt?: string;
-    content: string;
+    description: string;
     image?: string;
     category?: string;
     author?: string;
@@ -28,19 +28,17 @@ interface BlogItem {
 
 async function getBlog(slug: string): Promise<BlogItem | null> {
     try {
+        console.log(slug, "sdnifjkspdfksdf")
         if (!BaseUrl) {
             console.error("NEXT_PUBLIC_API_URL is not configured.");
             return null;
         }
 
-        const blogUrl = `${BaseUrl.replace(/\/$/, "")}/blogs/${encodeURIComponent(
-            slug
-        )}`;
+        const blogUrl = `${BaseUrl}/blogs/slug/${slug}`;
 
         const response = await fetch(blogUrl, {
             cache: "no-store",
         });
-
         if (!response.ok) return null;
 
         const result = await response.json();
@@ -130,6 +128,8 @@ export default async function BlogDetailsPage({
         getRecentBlogs(slug),
     ]);
 
+    console.log(blog, "response12323")
+
     if (!blog) {
         return (
             <section className="py-16 md:py-24">
@@ -212,7 +212,7 @@ export default async function BlogDetailsPage({
 
                                 <span className="flex items-center gap-2 text-sm text-[#647077]">
                                     <Clock3 size={16} />
-                                    {getReadingTime(blog.content || "")} min read
+                                    {getReadingTime(blog.description || "")} min read
                                 </span>
                             </div>
 
@@ -258,7 +258,7 @@ export default async function BlogDetailsPage({
                         <div
                             className="blog-content min-w-0 break-words text-base leading-8 text-[#46515A]"
                             dangerouslySetInnerHTML={{
-                                __html: blog.content || "",
+                                __html: blog.description || "",
                             }}
                         />
 
@@ -302,7 +302,7 @@ export default async function BlogDetailsPage({
                                 Our Blog
                             </p>
 
-                            <h2 className="mt-3 text-2xl font-bold leading-snug">
+                            <h2 className="mt-3 text-2xl font-bold text-[#FFFFFF] leading-snug">
                                 Explore more insights
                             </h2>
 

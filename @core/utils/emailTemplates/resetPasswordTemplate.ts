@@ -27,7 +27,7 @@ style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5
       <td align="left">
         <img 
           src="${"logo"}" 
-          alt="Adaired"
+          alt="Strap World"
           style="height:32px"
         />
       </td>
@@ -84,7 +84,7 @@ style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5
   font-size:12px;
   color:#6b7280;
 ">
-  © ${new Date().getFullYear()} Adaired • Password Reset
+  © ${new Date().getFullYear()} Strap World • Password Reset
 </td>
 </tr>
 

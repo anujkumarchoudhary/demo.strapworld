@@ -1,22 +1,22 @@
 export const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "@id": "https://adaired.com/#organization",
+  "@id": "https://strap.com/#organization",
 
-  name: "Adaired Digital Media",
+  name: "strap Digital Media",
 
-  url: "https://adaired.com",
+  url: "https://strap.com",
 
-  logo: "https://adaired.com/_next/static/media/AdAired_Logo.cdbe72f0.svg",
+  logo: "https://strap.com/_next/static/media/strap_Logo.cdbe72f0.svg",
 
-  image: "https://adaired.com/_next/static/media/AdAired_Logo.cdbe72f0.svg",
+  image: "https://strap.com/_next/static/media/strap_Logo.cdbe72f0.svg",
 
   description:
-    "Adaired Digital Media is a full-service digital marketing agency providing SEO, AI SEO, Local SEO, Link Building, PPC Advertising, Content Marketing, Social Media Marketing, Web Design, WordPress Development, Shopify Development, and Custom Web Development services.",
+    "strap Digital Media is a full-service digital marketing agency providing SEO, AI SEO, Local SEO, Link Building, PPC Advertising, Content Marketing, Social Media Marketing, Web Design, WordPress Development, Shopify Development, and Custom Web Development services.",
 
   foundingDate: "2017",
 
-  email: "contact@adaired.com",
+  email: "contact@strap.com",
 
   telephone: "+1-775-295-8661",
 
@@ -32,7 +32,7 @@ export const organizationSchema = {
   location: [
     {
       "@type": "Place",
-      name: "Adaired Digital Media USA",
+      name: "strap  USA",
       address: {
         "@type": "PostalAddress",
         streetAddress: "390 NE 191st St STE 8548",
@@ -44,7 +44,7 @@ export const organizationSchema = {
     },
     {
       "@type": "Place",
-      name: "Adaired Digital Media India",
+      name: "strap  India",
       address: {
         "@type": "PostalAddress",
         streetAddress: "B-509, 5th Floor, Bestech Business Towers, Sector 66",
@@ -74,10 +74,10 @@ export const organizationSchema = {
   ],
 
   sameAs: [
-    "https://www.facebook.com/adaired.digital/",
-    "https://www.linkedin.com/company/adaired/",
-    "https://www.instagram.com/adaired.digital/",
-    "https://x.com/AdAiredDigital",
+    "https://www.facebook.com/",
+    "https://www.linkedin.com/",
+    "https://www.instagram.com/",
+    "https://x.com/",
   ],
 
   knowsAbout: [

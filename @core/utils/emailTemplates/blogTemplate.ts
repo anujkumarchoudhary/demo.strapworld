@@ -56,8 +56,8 @@ export const blogNotificationTemplate = ({
 
       <td align="left">
         <img 
-          src="/Home%20Page/AdAired_Logo_f179tt.svg" 
-          alt="Adaired"
+          src="/Home%20Page/Strap World Worlded_Logo_f179tt.svg" 
+          alt="Strap World"
           style="height:34px"
         />
       </td>
@@ -188,7 +188,7 @@ ${section(`
 <!-- BUTTON -->
 ${section(`
   <a
-    href="https://adaired.com/blog/${slug}"
+    href="https://Strap World.com/blog/${slug}"
     style="
       display:inline-block;
       background:#1b5a96;
@@ -218,7 +218,7 @@ ${section(`
 >
 
   <div style="margin-bottom:8px">
-    © ${new Date().getFullYear()} Adaired
+    © ${new Date().getFullYear()} Strap World
   </div>
 
   <div>

@@ -202,9 +202,7 @@ export default function LoginPage() {
                 ? "Sign Up"
                 : "Login"}
           </button>
-
-          {/* <p className="text-sm pt-10 text-center"> Don't Have an Account? <span className="text-blue-600 text-sm">Sign Up</span></p> */}
-
+{/* 
           <p className="text-sm  text-center">
             {isSignup ? "Already have an account?" : "Don't Have an Account?"}{" "}
             <span
@@ -213,7 +211,7 @@ export default function LoginPage() {
             >
               {isSignup ? "Login" : "Sign Up"}
             </span>
-          </p>
+          </p> */}
 
           {showForgotModal && (
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">

@@ -2,11 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-
 import Link from "next/link";
 import AdminAuthGuard from "./AdminAuthGuard";
-
-
 import axios from "axios";
 import { socket } from "@/@core/lib/socket";
 
@@ -23,8 +20,7 @@ import {
 } from "react-icons/md";
 
 import { categoryConfig, menuData, Notifications } from "./data/data";
-import logo from '../../../public/starp_world.svg'
-
+import logo from "../../../public/starp_world.svg";
 import Image from "next/image";
 import { BaseUrl } from "../baseurl";
 
@@ -35,8 +31,11 @@ export default function AdminLayout({
 }) {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const router = useRouter();
   const pathname = usePathname();
+
   const [userData, setUserData] = useState<any>(null);
   const [refresh, setRefresh] = useState(false);
   const [open, setOpen] = useState(false);
@@ -44,6 +43,11 @@ export default function AdminLayout({
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
+
+  // Close mobile sidebar when the route changes.
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const removeNotification = (id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -54,8 +58,10 @@ export default function AdminLayout({
     localStorage.removeItem("user");
     router.push("/login");
   };
+
   useEffect(() => {
     const user = localStorage.getItem("user");
+
     if (user) {
       setUserData(JSON.parse(user));
     }
@@ -86,7 +92,6 @@ export default function AdminLayout({
       console.log("📦 API DATA:", res.data);
 
       const data = res.data.data || [];
-
       const filtered = data.filter((item: any) => item.isRead === false);
 
       setEnquiries(filtered);
@@ -97,112 +102,137 @@ export default function AdminLayout({
     }
   };
 
-  /* =========================
-     INITIAL API CALL
-  ========================== */
-
   useEffect(() => {
     fetchEnquiries();
   }, [refresh]);
 
-  /* =========================
-     REALTIME SOCKET UPDATE
-  ========================== */
-
-  // useEffect(() => {
-  //   socket.on("new_contact", (data) => {
-  //     console.log("🔥 NEW REALTIME CONTACT:", data);
-  //     setRefresh((prev) => !prev);
-  //   });
-
-  //   return () => {
-  //     socket.off("new_contact");
-  //   };
-  // }, []);
+  /*
+   * REALTIME SOCKET UPDATE
+   *
+   * Existing socket functionality is left unchanged.
+   */
 
   return (
-    <div className="min-h-screen">
-      <header className="fixed top-0 left-0 w-full py-4 px-10 bg-white flex items-center justify-between z-50 shadow-sm">
-        <div
-          onClick={() => router.push("/admin")}
-          className="flex cursor-pointer gap-6"
-        >
-          <Image
-            src={logo}
-            alt="Logo"
-            width={140}
-            height={50}
-            className=""
-          />
-          <div
-            onClick={() => setIsOpen(!isOpen)}
-            className={` ${isOpen ? "left-66.5" : "left-26.5"
-              }    cursor-pointer p-2 flex items-center justify-center active:scale-95 transition-all duration-300`}
+    <div className="min-h-screen overflow-x-clip">
+      {/* ================= HEADER ================= */}
+      <header className="fixed top-0 left-0 z-50 flex w-full items-center justify-between gap-2 bg-white px-3 py-3 shadow-sm sm:px-6 sm:py-4 lg:px-10">
+        {/* Header left section */}
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4 lg:gap-6">
+          {/* Mobile menu toggle */}
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? "Close sidebar" : "Open sidebar"}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            className="shrink-0 cursor-pointer p-2 lg:hidden"
           >
-            {isOpen ? (
-              <MdKeyboardDoubleArrowLeft size={25} />
-            ) : (
-              <MdKeyboardDoubleArrowRight size={25} />
-            )}
+            <span className="text-2xl leading-none">☰</span>
+          </button>
+
+          <div
+            onClick={() => router.push("/admin")}
+            className="flex min-w-0 shrink-0 cursor-pointer items-center gap-2 sm:gap-4 lg:gap-6"
+          >
+            <Image
+              src={logo}
+              alt="Logo"
+              width={140}
+              height={50}
+              className="h-auto w-45 sm:w-50 lg:w-50"
+            />
+
+            {/* Desktop sidebar collapse button */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(!isOpen);
+              }}
+              className={`${
+                isOpen ? "left-66.5" : "left-26.5"
+              } hidden cursor-pointer items-center justify-center p-2 transition-all duration-300 active:scale-95 lg:flex`}
+            >
+              {isOpen ? (
+                <MdKeyboardDoubleArrowLeft size={25} />
+              ) : (
+                <MdKeyboardDoubleArrowRight size={25} />
+              )}
+            </div>
           </div>
-          <div className="rounded-full w-100 bg-[#f8f8f8] border border-black/10 flex items-center overflow-hidden transition-all duration-300">
+
+          {/* Search - hidden on mobile */}
+          <div className="hidden min-w-0 max-w-100 flex-1 items-center overflow-hidden rounded-full border border-black/10 bg-[#f8f8f8] transition-all duration-300 md:flex">
             <input
               type="text"
-              placeholder={"Search..."}
+              placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full outline-none px-5 py-3"
+              className="w-full min-w-0 px-5 py-3 outline-none"
             />
           </div>
         </div>
-        <div className="flex justify-between gap-4">
+
+        {/* Header right section */}
+        <div className="flex shrink-0 items-center justify-between gap-2 sm:gap-4">
+          {/* ================= NOTIFICATIONS ================= */}
           <div className="relative group pb-2">
-            <div className="relative cursor-pointer p-2 rounded-full bg-green-100">
+            <div className="relative cursor-pointer rounded-full bg-green-100 p-2">
               <FaRegBell
                 size={25}
                 onClick={() => setOpen((prev) => !prev)}
-                className="text-green-600 z-50"
+                className="z-50 text-green-600"
               />
 
               {enquiries.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] w-fit h-fit font-bold flex items-center justify-center py-0.5 px-2 rounded-full">
+                <span className="absolute -top-2 -right-2 flex h-fit w-fit items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-[12px] font-bold text-white">
                   {enquiries.length > 9 ? "9+" : enquiries.length}
                 </span>
               )}
 
-              <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl border border-primary/30 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-4">
+              <div
+                className={`absolute right-0 mt-3 w-[min(20rem,calc(100vw-1.5rem))] rounded-2xl border border-primary/30 bg-white p-4 shadow-lg transition-all duration-200 ${
+                  open
+                    ? "visible opacity-100"
+                    : "invisible opacity-0 group-hover:visible group-hover:opacity-100"
+                }`}
+              >
                 <div className="flex items-center gap-2">
                   <FaRegBell className="text-xl" />
-                  <h2 className="font-semibold text-xl">Notification</h2>
+                  <h2 className="text-xl font-semibold">Notification</h2>
                 </div>
 
-                <div className="flex gap-2 my-3">
+                <div className="my-3 flex flex-wrap gap-2">
                   {["all", "unread", "read"].map((tab, index) => (
                     <button
+                      type="button"
                       aria-label={`read ${index + 1}`}
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-3 py-1 text-xs rounded-full ${activeTab === tab
-                        ? "bg-black text-white"
-                        : "bg-gray-200"
-                        }`}
+                      className={`rounded-full px-3 py-1 text-xs ${
+                        activeTab === tab
+                          ? "bg-black text-white"
+                          : "bg-gray-200"
+                      }`}
                     >
                       {tab}
                     </button>
                   ))}
                 </div>
 
-                {/* List */}
-                <div className="space-y-4 max-h-72 overflow-y-auto">
+                {/* Notification list */}
+                <div className="max-h-72 space-y-4 overflow-y-auto">
                   {Object.entries(groupedNotifications).map(
                     ([type, items]: any) => {
                       const config =
-                        categoryConfig[type as keyof typeof categoryConfig];
+                        categoryConfig[
+                          type as keyof typeof categoryConfig
+                        ];
+
+                      if (!config) return null;
 
                       return (
                         <div key={type}>
                           <p
-                            className="text-xs font-semibold mb-2"
+                            className="mb-2 text-xs font-semibold"
                             style={{ color: config.color }}
                           >
                             {config.label} ({items.length})
@@ -212,7 +242,7 @@ export default function AdminLayout({
                             {items.map((n: any) => (
                               <div
                                 key={n.id}
-                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100"
+                                className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-100"
                                 style={
                                   !n.isRead
                                     ? { backgroundColor: config.bg }
@@ -220,7 +250,7 @@ export default function AdminLayout({
                                 }
                               >
                                 <div
-                                  className="w-8 h-8 flex items-center justify-center rounded-full"
+                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
                                   style={{
                                     backgroundColor: config.bg,
                                     color: config.color,
@@ -229,9 +259,12 @@ export default function AdminLayout({
                                   {config.icon}
                                 </div>
 
-                                <div className="flex-1">
-                                  <p className="text-sm">{n.text}</p>
-                                  <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                                <div className="min-w-0 flex-1">
+                                  <p className="break-words text-sm">
+                                    {n.text}
+                                  </p>
+
+                                  <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
                                     <FaClock size={12} />
                                     <p className="text-xs text-gray-400">
                                       {n.time}
@@ -242,7 +275,7 @@ export default function AdminLayout({
                                 <div
                                   onMouseEnter={() => setHoveredId(n.id)}
                                   onMouseLeave={() => setHoveredId(null)}
-                                  className="w-5 h-5 flex items-center justify-center cursor-pointer"
+                                  className="flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center"
                                 >
                                   {hoveredId === n.id ? (
                                     <span
@@ -253,11 +286,11 @@ export default function AdminLayout({
                                   ) : (
                                     !n.isRead && (
                                       <span
-                                        className="w-2 h-2 rounded-full"
+                                        className="h-2 w-2 rounded-full"
                                         style={{
                                           backgroundColor: config.color,
                                         }}
-                                      ></span>
+                                      />
                                     )
                                   )}
                                 </div>
@@ -270,7 +303,7 @@ export default function AdminLayout({
                   )}
 
                   {Object.keys(groupedNotifications).length === 0 && (
-                    <p className="text-center text-gray-400 text-sm">
+                    <p className="text-center text-sm text-gray-400">
                       No notifications
                     </p>
                   )}
@@ -279,28 +312,39 @@ export default function AdminLayout({
             </div>
           </div>
 
+          {/* ================= PROFILE ================= */}
           <div className="relative group pb-2">
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <div className="rounded-full bg-orange-100 p-2">
-                <BiUser size={25} className="text-orange-600 cursor-pointer" />
+                <BiUser
+                  size={25}
+                  className="cursor-pointer text-orange-600"
+                />
               </div>
-              <p className=" font-semibold py-1 my-auto">
+
+              <p className="my-auto hidden py-1 font-semibold sm:block">
                 {userData?.name?.split(" ")[0]}
               </p>
             </div>
 
-            <div className="absolute right-0 mt-1 w-60 bg-white rounded-2xl border border-secondary/30 opacity-0 invisible group-hover:opacity-100 group-hover:visible     transition-all duration-200">
+            <div className="invisible absolute right-0 mt-1 w-[min(15rem,calc(100vw-1.5rem))] rounded-2xl border border-secondary/30 bg-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
               <div className="px-4 pt-4 text-center">
-                <FaCircleUser className="text-5xl text-primary mx-auto" />
-                <p className="text-sm font-semibold py-1">{userData?.name}</p>
-                <p className="text-xs text-gray-500">{userData?.email}</p>
+                <FaCircleUser className="mx-auto text-5xl text-primary" />
+
+                <p className="break-words py-1 text-sm font-semibold">
+                  {userData?.name}
+                </p>
+
+                <p className="break-all text-xs text-gray-500">
+                  {userData?.email}
+                </p>
               </div>
 
               <button
                 onClick={handleLogout}
-                className="w-full py-4 px-3 cursor-pointer hover:text-red-600 font-semibold transition"
+                className="w-full cursor-pointer px-3 py-4 font-semibold transition hover:text-red-600"
               >
-                <div className="flex gap-2 items-center justify-center">
+                <div className="flex items-center justify-center gap-2">
                   {isOpen && "Logout"}
                   <MdLogout size={20} />
                 </div>
@@ -310,16 +354,31 @@ export default function AdminLayout({
         </div>
       </header>
 
-      <div className="flex pt-[5.4rem]">
-        {/* Sidebar */}
+      {/* ================= MOBILE BACKDROP ================= */}
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-x-0 bottom-0 top-16 z-30 bg-black/40 sm:top-[5.4rem] lg:hidden"
+        />
+      )}
+
+      {/* ================= SIDEBAR ================= */}
+      <div className="flex min-w-0 pt-16 sm:pt-[5.4rem]">
         <aside
           className={`
-          fixed left-0 flex flex-col justify-between
-          transition-all duration-300 ease-in-out shadow-md
-          ${isOpen ? "w-68" : "w-24"}
-          h-[calc(100vh-4rem)]
-          bg-white py-4 pr-4 z-10
-        `}
+            fixed left-0 top-16 sm:top-[5.4rem]
+            z-40 flex flex-col justify-between
+            overflow-x-hidden overflow-y-auto
+            bg-white py-4 pr-4 shadow-md
+            transition-all duration-300 ease-in-out
+            h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-5.4rem)]
+            w-68
+            ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+            lg:translate-x-0
+            ${isOpen ? "lg:w-68" : "lg:w-24"}
+          `}
         >
           {/* ================= MENU ================= */}
           <div>
@@ -328,7 +387,9 @@ export default function AdminLayout({
 
               const isActive =
                 (menu.path && pathname === menu.path) ||
-                (menu.path !== "/admin" && pathname.startsWith(menu.path)) ||
+                (menu.path !== "/admin" &&
+                  menu.path &&
+                  pathname.startsWith(menu.path)) ||
                 (hasChildren &&
                   menu.children.some((sub: any) =>
                     pathname.startsWith(sub.path),
@@ -336,68 +397,72 @@ export default function AdminLayout({
 
               const isOpenMenu = openMenu === menu.label;
 
-              /* ================= CLICK HANDLER ================= */
               const handleClick = () => {
                 if (hasChildren) {
                   setOpenMenu(isOpenMenu ? null : menu.label);
                 }
               };
 
+              // Keep labels visible in the mobile drawer.
+              const showLabels = isOpen || mobileMenuOpen;
+
               return (
                 <div key={idx}>
-                  {/* ================= ITEM ================= */}
-
+                  {/* Parent menu */}
                   {hasChildren ? (
-                    /* ===== PARENT (NO LINK, ONLY TOGGLE) ===== */
                     <div
                       onClick={handleClick}
                       className={`
-                      relative cursor-pointer rounded-r-full mb-2
-                      transition-all duration-300
-                      ${isOpen ? "py-2 px-4" : "py-2 flex justify-center"}
-                      ${isActive ? "text-white" : "text-gray-600 hover:text-black"}
-                    `}
+                        relative mb-2 cursor-pointer rounded-r-full
+                        transition-all duration-300
+                        ${
+                          showLabels
+                            ? "px-4 py-2"
+                            : "flex justify-center py-2"
+                        }
+                        ${
+                          isActive
+                            ? "text-white"
+                            : "text-gray-600 hover:text-black"
+                        }
+                      `}
                     >
-                      {/* ACTIVE BG */}
                       {isActive && (
-                        <span className="absolute inset-0 rounded-r-full bg-linear-to-r from-primary/90 to-primary backdrop-blur-md border border-white/20 shadow-md" />
+                        <span className="absolute inset-0 rounded-r-full border border-white/20 bg-linear-to-r from-primary/90 to-primary shadow-md backdrop-blur-md" />
                       )}
 
-                      {/* HOVER BG */}
                       {!isActive && (
-                        <span className="absolute inset-0 rounded-r-full bg-white/40 backdrop-blur-sm opacity-0 hover:opacity-100 transition border border-white/20" />
+                        <span className="absolute inset-0 rounded-r-full border border-white/20 bg-white/40 opacity-0 transition hover:opacity-100 backdrop-blur-sm" />
                       )}
 
-                      {/* CONTENT */}
                       <div
-                        className={`relative flex items-center z-10 ${isOpen ? "justify-between" : "justify-center"
-                          }`}
+                        className={`relative z-10 flex items-center ${
+                          showLabels ? "justify-between" : "justify-center"
+                        }`}
                       >
-                        {/* LEFT */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex min-w-0 items-center gap-3">
                           <span
-                            className={`p-2 rounded-full ${isActive
-                              ? "bg-white/20 text-white"
-                              : "text-gray-500"
-                              }`}
+                            className={`shrink-0 rounded-full p-2 ${
+                              isActive
+                                ? "bg-white/20 text-white"
+                                : "text-gray-500"
+                            }`}
                           >
                             {menu.icon}
                           </span>
 
-                          {isOpen && (
-                            <p className="font-medium tracking-wide">
+                          {showLabels && (
+                            <p className="truncate font-medium tracking-wide">
                               {menu.label}
                             </p>
                           )}
                         </div>
 
-                        {/* RIGHT ARROW */}
-                        {hasChildren && isOpen && (
+                        {showLabels && (
                           <span
-                            className={`
-                            transition-transform duration-300 text-sm
-                            ${isOpenMenu ? "rotate-180" : ""}
-                          `}
+                            className={`shrink-0 text-sm transition-transform duration-300 ${
+                              isOpenMenu ? "rotate-180" : ""
+                            }`}
                           >
                             <MdKeyboardArrowDown size={20} />
                           </span>
@@ -405,42 +470,50 @@ export default function AdminLayout({
                       </div>
                     </div>
                   ) : (
-                    /* ===== NORMAL LINK ===== */
+                    /* Normal menu link */
                     <Link
                       href={menu.path}
+                      onClick={() => setMobileMenuOpen(false)}
                       className={`
-                      relative block rounded-r-full mb-2
-                      transition-all duration-300
-                      ${isOpen ? "py-2 px-4" : "py-2 flex justify-center"}
-                      ${isActive ? "text-white" : "text-gray-600 hover:text-black"}
-                    `}
+                        relative mb-2 block rounded-r-full
+                        transition-all duration-300
+                        ${
+                          showLabels
+                            ? "px-4 py-2"
+                            : "flex justify-center py-2"
+                        }
+                        ${
+                          isActive
+                            ? "text-white"
+                            : "text-gray-600 hover:text-black"
+                        }
+                      `}
                     >
-                      {/* ACTIVE BG */}
                       {isActive && (
-                        <span className="absolute inset-0 rounded-r-full bg-linear-to-r from-primary/90 to-primary backdrop-blur-md border border-white/20 shadow-md" />
+                        <span className="absolute inset-0 rounded-r-full border border-white/20 bg-linear-to-r from-primary/90 to-primary shadow-md backdrop-blur-md" />
                       )}
 
-                      {/* HOVER BG */}
                       {!isActive && (
-                        <span className="absolute inset-0 rounded-r-full bg-white/40 backdrop-blur-sm opacity-0 hover:opacity-100 transition border border-white/20" />
+                        <span className="absolute inset-0 rounded-r-full border border-white/20 bg-white/40 opacity-0 transition hover:opacity-100 backdrop-blur-sm" />
                       )}
 
-                      {/* CONTENT */}
                       <div
-                        className={`relative flex items-center z-10 ${isOpen ? "gap-3" : "justify-center"
-                          }`}
+                        className={`relative z-10 flex items-center ${
+                          showLabels ? "gap-3" : "justify-center"
+                        }`}
                       >
                         <span
-                          className={`p-2 rounded-full ${isActive
-                            ? "bg-white/20 text-white"
-                            : "text-gray-500"
-                            }`}
+                          className={`shrink-0 rounded-full p-2 ${
+                            isActive
+                              ? "bg-white/20 text-white"
+                              : "text-gray-500"
+                          }`}
                         >
                           {menu.icon}
                         </span>
 
-                        {isOpen && (
-                          <p className="font-medium tracking-wide">
+                        {showLabels && (
+                          <p className="truncate font-medium tracking-wide">
                             {menu.label}
                           </p>
                         )}
@@ -449,42 +522,42 @@ export default function AdminLayout({
                   )}
 
                   {/* ================= SUBMENU ================= */}
-                  {hasChildren && isOpenMenu && isOpen && (
-                    <div className="ml-0 w-[80%] mb-1 space-y-1">
-                      {menu.children.map((sub: any, i: any) => {
+                  {hasChildren && isOpenMenu && showLabels && (
+                    <div className="mb-1 ml-0 w-[80%] space-y-1">
+                      {menu.children.map((sub: any, i: number) => {
                         const isSubActive = pathname === sub.path;
 
                         return (
                           <Link
                             key={i}
                             href={sub.path}
+                            onClick={() => setMobileMenuOpen(false)}
                             className={`
-            relative block rounded-r-full transition-all  duration-300
-            py-3 pl-8 pr-4 text-[28px]
-            ${isSubActive ? "text-white" : "text-gray-600 hover:text-black"}
-          `}
+                              relative block rounded-r-full py-3 pl-8 pr-4
+                              transition-all duration-300
+                              ${
+                                isSubActive
+                                  ? "text-white"
+                                  : "text-gray-600 hover:text-black"
+                              }
+                            `}
                           >
-                            {/* ACTIVE BG */}
                             {isSubActive && (
-                              <span className="absolute inset-0  rounded-r-full bg-linear-to-r from-primary/80 to-primary backdrop-blur-md border border-white/20 shadow-md" />
+                              <span className="absolute inset-0 rounded-r-full border border-white/20 bg-linear-to-r from-primary/80 to-primary shadow-md backdrop-blur-md" />
                             )}
 
-                            {/* HOVER BG */}
                             {!isSubActive && (
-                              <span className="absolute inset-0 rounded-r-full bg-white/40 backdrop-blur-sm opacity-0 hover:opacity-100 transition border border-white/20" />
+                              <span className="absolute inset-0 rounded-r-full border border-white/20 bg-white/40 opacity-0 transition hover:opacity-100 backdrop-blur-sm" />
                             )}
 
-                            {/* CONTENT */}
                             <div className="relative z-10 flex items-center gap-3">
-                              {/* SMALL DOT ICON (like indicator) */}
                               <span
-                                className={`
-                w-2 h-2 rounded-full
-                ${isSubActive ? "bg-white" : "bg-gray-400"}
-              `}
+                                className={`h-2 w-2 shrink-0 rounded-full ${
+                                  isSubActive ? "bg-white" : "bg-gray-400"
+                                }`}
                               />
 
-                              <span className="text-[1rem] font-medium tracking-wide">
+                              <span className="truncate text-[1rem] font-medium tracking-wide">
                                 {sub.label}
                               </span>
                             </div>
@@ -501,18 +574,24 @@ export default function AdminLayout({
           {/* ================= SETTINGS ================= */}
           <button
             aria-label="Settings"
-            className="mb-4 py-3 px-3 rounded-md bg-blue-100 hover:bg-red-100 hover:text-red-600 font-semibold transition"
+            className="mb-4 rounded-md bg-blue-100 px-3 py-3 font-semibold transition hover:bg-red-100 hover:text-red-600"
           >
-            <div className="flex gap-3 items-center justify-center">
+            <div className="flex items-center justify-center gap-3">
               <IoSettingsOutline size={20} />
-              {isOpen && "Settings"}
+              {(isOpen || mobileMenuOpen) && "Settings"}
             </div>
           </button>
         </aside>
 
-        {/* Main Content */}
+        {/* ================= MAIN CONTENT ================= */}
         <main
-          className={`bg-slate-50 ${isOpen ? "ml-68" : "ml-24"} w-full h-full transition-all duration-300 p-6`}
+          className={`
+            min-h-[calc(100dvh-4rem)] min-w-0 flex-1
+            bg-slate-50 p-3 transition-all duration-300
+            sm:p-5 lg:p-6
+            ml-0
+            ${isOpen ? "lg:ml-68" : "lg:ml-24"}
+          `}
         >
           <AdminAuthGuard>{children}</AdminAuthGuard>
         </main>

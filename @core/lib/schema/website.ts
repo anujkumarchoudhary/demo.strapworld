@@ -3,21 +3,21 @@ export const websiteSchema = {
 
   "@type": "WebSite",
 
-  "@id": "https://adaired.com/#website",
+  "@id": "https://strap.com/#website",
 
-  url: "https://adaired.com",
+  url: "https://strap.com",
 
-  name: "Adaired Digital Media",
+  name: "strap Digital Media",
 
   publisher: {
-    "@id": "https://adaired.com/#organization",
+    "@id": "https://strap.com/#organization",
   },
 
   inLanguage: ["en-US", "en-IN"],
 
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://adaired.com/?s={search_term_string}",
+    target: "https://strap.com/?s={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };

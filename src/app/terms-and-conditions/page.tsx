@@ -218,7 +218,7 @@ export default function TermsAndConditionsPage() {
                 <span className="font-medium text-[#0B1E2D]">
                   Email:
                 </span>{" "}
-                enquiry@strapworld.com
+                nalandaindustri@gmail.com
               </p>
 
               <p>

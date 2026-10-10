@@ -11,11 +11,11 @@ type PieItem = {
 
 /* ================= DATA ================= */
 const data: PieItem[] = [
-  { name: "SEO", value: 35, color: "#4ade80" },
-  { name: "PPC", value: 25, color: "#60a5fa" },
-  { name: "SMM", value: 20, color: "#fbbf24" },
-  { name: "Content", value: 15, color: "#f87171" },
-  { name: "Others", value: 5, color: "#a78bfa" },
+  { name: "Cotton Bale Strap", value: 35, color: "#4ade80" },
+  { name: "Polyester Pet", value: 25, color: "#60a5fa" },
+  { name: "Industrial Packaging", value: 20, color: "#fbbf24" },
+  { name: "PP Strap", value: 15, color: "#f87171" },
+  { name: "PET Strap", value: 5, color: "#a78bfa" },
 ];
 
 /* ================= UTILS ================= */
@@ -80,7 +80,7 @@ const PieChart = () => {
           ))}
         </defs>
 
-        <text x="20" y="10" fontSize="20" fontWeight="700">
+        <text x="20" y="20" fontSize="20" fontWeight="700">
           Traffic Distribution
         </text>
 

@@ -1,17 +1,17 @@
 export const BlogSchema = {
   "@type": "Blog",
 
-  "@id": "https://adaired.com/blog#blog",
+  "@id": "https://strapworld.com/blog#blog",
 
-  url: "https://adaired.com/blog",
+  url: "https://strapworld.com/blog",
 
-  name: "Adaired Digital Media Blog",
+  name: "strapworld Digital Media Blog",
 
   description:
-    "Expert insights, SEO strategies, AI SEO trends, web development guides, PPC tips, Shopify development resources, and digital marketing articles from Adaired Digital Media.",
+    "Expert insights, SEO strategies, AI SEO trends, web development guides, PPC tips, Shopify development resources, and digital marketing articles from strapworld Digital Media.",
 
   publisher: {
-    "@id": "https://adaired.com/#organization",
+    "@id": "https://stra.com/#organization",
   },
 
   inLanguage: "en-US",

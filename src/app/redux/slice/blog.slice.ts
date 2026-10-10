@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { BaseURL } from "@/app/baseUrl";
+import { BaseUrl } from "../../baseurl";
 
 export const fetchBlogs = createAsyncThunk(
   "blog/fetchBlogs",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch(`${BaseURL}blog?page=1&limit=3`);
+      const res = await fetch(`${BaseUrl}blog?page=1&limit=3`);
 
       if (!res.ok) {
         throw new Error("Failed to fetch blogs");

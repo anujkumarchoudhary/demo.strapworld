@@ -52,8 +52,8 @@ style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5
     <tr>
       <td align="left">
        <img 
-          src="/AdAired_Logo.svg"
-          alt="Adaired"
+          src="/Strap World.svg"
+          alt="Strap World"
           style="height:32px"
         />
       </td>
@@ -91,7 +91,7 @@ ${safeRow("Message", description)}
   font-size:12px;
   color:#6b7280;
 ">
-  © ${new Date().getFullYear()} Adaired • Contact Notification
+  © ${new Date().getFullYear()} Strap World • Contact Notification
 </td>
 </tr>
 

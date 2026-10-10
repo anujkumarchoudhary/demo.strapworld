@@ -138,7 +138,7 @@ const Footer = () => {
               </div>
 
               <p className="flex items-center text-[clamp(14px,1.0625vw,17px)] font-medium text-white/70">
-                sales@strapworld.com
+                nalandaindustri@gmail.com
               </p>
             </div>
           </div>

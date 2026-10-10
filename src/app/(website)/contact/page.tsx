@@ -60,7 +60,7 @@ Kagdadi town, Rajkot - 360003.`,
   {
     icon: <IoIosMailOpen size={32} />,
     title: "Email Us",
-    description: "sales@strapworld.com",
+    description: "nalandaindustri@gmail.com",
   },
 ];
 

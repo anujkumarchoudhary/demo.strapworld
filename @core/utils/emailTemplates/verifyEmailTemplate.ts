@@ -26,7 +26,7 @@ style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5
       <td align="left">
         <img 
           src="" 
-          alt="Adaired"
+          alt="Srap World"
           style="height:32px"
         />
       </td>
@@ -43,7 +43,7 @@ style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5
 <td style="padding:30px;text-align:center">
 
   <h2 style="margin:0 0 10px;color:#111827">
-    Welcome to Adaired 🚀
+    Welcome to Srap World 🚀
   </h2>
 
   <p style="color:#6b7280;font-size:14px;margin-bottom:20px">
@@ -79,7 +79,7 @@ style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5
   font-size:12px;
   color:#6b7280;
 ">
-  © ${new Date().getFullYear()} Adaired • Email Verification
+  © ${new Date().getFullYear()} Strap World • Email Verification
 </td>
 </tr>
 

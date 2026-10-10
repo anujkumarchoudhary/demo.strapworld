@@ -16,42 +16,47 @@ import { GoArrowSwitch } from "react-icons/go";
 
 export const menuData = [
   { label: "Dashboard", path: "/admin", icon: <RiDashboardFill size={20} /> },
-  {
-    label: "Sales",
-    icon: <PiShoppingCartSimple size={20} />,
-    children: [
-      {
-        label: "Products",
-        path: "/admin/product",
-        icon: <IoLayers size={20} />,
-      },
-      {
-        label: "Orders",
-        path: "/admin/order",
-      },
-      {
-        label: "Payments",
-        path: "/admin/sales/payments",
-      },
-      {
-        label: "Invoices",
-        path: "/admin/sales/invoices",
-      },
-    ],
+  // {
+  //   label: "Sales",
+  //   icon: <PiShoppingCartSimple size={20} />,
+  //   children: [
+  //     {
+  //       label: "Products",
+  //       path: "/admin/product",
+  //       icon: <IoLayers size={20} />,
+  //     },
+  //     {
+  //       label: "Orders",
+  //       path: "/admin/order",
+  //     },
+  //     {
+  //       label: "Payments",
+  //       path: "/admin/sales/payments",
+  //     },
+  //     {
+  //       label: "Invoices",
+  //       path: "/admin/sales/invoices",
+  //     },
+  //   ],
+  // },
+    {
+    label: "Enquiry",
+    path: "/admin/enquiry",
+    icon: <AiOutlineQuestionCircle size={20} />,
   },
-  { label: "Blog", path: "/admin/blog", icon: <FaBlog size={20} /> },
-  { label: "Redirects", path: "/admin/redirect", icon: <GoArrowSwitch size={20} /> },
+    { label: "Blog", path: "/admin/blog", icon: <FaBlog size={20} /> },
+    { label: "Redirects", path: "/admin/redirect", icon: <GoArrowSwitch size={20} /> },
 
-  {
-    label: "Products Meta",
-    path: "/admin/products-meta",
-    icon: <FaServicestack size={20} />,
-  },
-  {
-    label: "Category",
-    path: "/admin/category",
-    icon: <MdCategory size={20} />,
-  },
+    {
+      label: "Products Meta",
+      path: "/admin/products-meta",
+      icon: <FaServicestack size={20} />,
+    },
+    // {
+    //   label: "Category",
+    //   path: "/admin/category",
+    //   icon: <MdCategory size={20} />,
+    // },
 
   // ✅ SALES (with submenu)
   {
@@ -59,25 +64,20 @@ export const menuData = [
     path: "/admin/notification",
     icon: <IoMdNotifications size={20} />,
   },
-  {
-    label: "Enquiry",
-    path: "/admin/enquiry",
-    icon: <AiOutlineQuestionCircle size={20} />,
-  },
-  {
-    label: "Preference",
-    icon: <MdRoomPreferences size={20} />,
-    children: [
-      {
-        label: "Templates",
-        path: "/admin/preferences",
-      },
-      {
-        label: "Global settings",
-        path: "#",
-      },
-    ],
-  },
+  // {
+  //   label: "Preference",
+  //   icon: <MdRoomPreferences size={20} />,
+  //   children: [
+  //     {
+  //       label: "Templates",
+  //       path: "/admin/preferences",
+  //     },
+  //     {
+  //       label: "Global settings",
+  //       path: "#",
+  //     },
+  //   ],
+  // },
 ];
 
 export const Notifications = [

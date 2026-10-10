@@ -3,22 +3,22 @@ export const indiaOfficeSchema = {
 
   "@type": "LocalBusiness",
 
-  "@id": "https://adaired.com/#mohali-office",
+  "@id": "https://strap.com/#mohali-office",
 
-  name: "Adaired Digital Media",
+  name: "strap Digital Media",
 
-  image: "https://adaired.com/_next/static/media/AdAired_Logo.cdbe72f0.svg",
+  image: "https://strap.com/_next/static/media/strap_Logo.cdbe72f0.svg",
 
-  url: "https://adaired.com",
+  url: "https://strap.com",
 
   telephone: "+91-8907300008",
 
-  email: "info@adaired.com",
+  email: "info@strap.com",
 
   priceRange: "$$",
 
   parentOrganization: {
-    "@id": "https://adaired.com/#organization",
+    "@id": "https://strap.com/#organization",
   },
 
   address: {

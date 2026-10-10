@@ -44,7 +44,7 @@ const ContactForm = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!API_URL) {
+    if (!BaseUrl) {
       toast.error("API URL is not configured.");
       return;
     }
@@ -67,7 +67,7 @@ const ContactForm = () => {
         .join("\n\n");
 
       const response = await axios.post(
-        `${API_URL.replace(/\/$/, "")}/enquiries`,
+        `${BaseUrl.replace(/\/$/, "")}/enquiries`,
         {
           name: formData.name.trim(),
           email: formData.email.trim(),

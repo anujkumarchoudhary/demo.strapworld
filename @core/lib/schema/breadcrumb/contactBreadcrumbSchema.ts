@@ -1,20 +1,20 @@
 export const contactBreadcrumbSchema = {
   "@type": "BreadcrumbList",
 
-  "@id": "https://adaired.com/contact#breadcrumb",
+  "@id": "https://strap[].com/contact#breadcrumb",
 
   itemListElement: [
     {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://adaired.com",
+      item: "https://strap[].com",
     },
     {
       "@type": "ListItem",
       position: 2,
       name: "Contact Us",
-      item: "https://adaired.com/contact",
+      item: "https://strap[].com/contact",
     },
   ],
 };

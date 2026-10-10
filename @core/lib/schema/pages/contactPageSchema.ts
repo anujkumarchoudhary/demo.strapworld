@@ -1,21 +1,21 @@
 export const contactPageSchema = {
   "@type": "ContactPage",
 
-  "@id": "https://adaired.com/contact#contactpage",
+  "@id": "https://strapworld.com/contact#contactpage",
 
-  url: "https://adaired.com/contact",
+  url: "https://strapworld.com/contact",
 
-  name: "Contact Adaired Digital Media",
+  name: "Contact strapworld Digital Media",
 
   description:
-    "Get in touch with Adaired Digital Media for SEO, AI SEO, Local SEO, PPC Advertising, Content Marketing, Social Media Marketing, Web Development, WordPress Development, Shopify Development, and Custom Web Development services.",
+    "Get in touch with strapworld Digital Media for SEO, AI SEO, Local SEO, PPC Advertising, Content Marketing, Social Media Marketing, Web Development, WordPress Development, Shopify Development, and Custom Web Development services.",
 
   isPartOf: {
-    "@id": "https://adaired.com/#website",
+    "@id": "https://strapworld.com/#website",
   },
 
   about: {
-    "@id": "https://adaired.com/#organization",
+    "@id": "https://strapworld.com/#organization",
   },
 
   inLanguage: "en-US",

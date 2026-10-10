@@ -1,15 +1,15 @@
 export const homeFaqSchema = {
   "@type": "FAQPage",
 
-  "@id": "https://adaired.com/#faq",
+  "@id": "https://strap.com/#faq",
 
   mainEntity: [
     {
       "@type": "Question",
-      name: "What digital marketing services does Adaired offer?",
+      name: "What digital marketing services does strap offer?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Adaired offers SEO, AI SEO, Local SEO, Link Building, PPC Advertising, Content Marketing, and Social Media Marketing services.",
+        text: "strap offers SEO, AI SEO, Local SEO, Link Building, PPC Advertising, Content Marketing, and Social Media Marketing services.",
       },
     },
     {
@@ -17,7 +17,7 @@ export const homeFaqSchema = {
       name: "Do you work with international clients?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Adaired serves businesses throughout the United States, India, Canada, Australia, and the United Kingdom.",
+        text: "Yes. strap serves businesses throughout the United States, India, Canada, Australia, and the United Kingdom.",
       },
     },
     {
@@ -30,10 +30,10 @@ export const homeFaqSchema = {
     },
     {
       "@type": "Question",
-      name: "Why choose Adaired Digital Media?",
+      name: "Why choose strap Digital Media?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Adaired develops customized digital marketing strategies focused on measurable growth, transparent reporting, and long-term success.",
+        text: "strap develops customized digital marketing strategies focused on measurable growth, transparent reporting, and long-term success.",
       },
     },
   ],

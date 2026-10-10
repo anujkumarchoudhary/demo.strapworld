@@ -3,22 +3,22 @@ export const usaOfficeSchema = {
 
   "@type": "LocalBusiness",
 
-  "@id": "https://adaired.com/#miami-office",
+  "@id": "https://strap.com/#miami-office",
 
-  name: "Adaired Digital Media USA",
+  name: "strap Digital Media USA",
 
-  image: "https://adaired.com/_next/static/media/AdAired_Logo.cdbe72f0.svg",
+  image: "https://strap.com/_next/static/media/strap_Logo.cdbe72f0.svg",
 
-  url: "https://adaired.com",
+  url: "https://strap.com",
 
   telephone: "+1-775-295-8661",
 
-  email: "info@adaired.com",
+  email: "info@strap.com",
 
   priceRange: "$$",
 
   parentOrganization: {
-    "@id": "https://adaired.com/#organization",
+    "@id": "https://strap.com/#organization",
   },
 
   address: {

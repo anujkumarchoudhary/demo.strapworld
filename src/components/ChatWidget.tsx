@@ -9,8 +9,10 @@ import {
   MessageSquareText,
   ArrowUpRight,
 } from "lucide-react";
+import GetEnquiryForm from "./form/GetEnquiryForm";
 
 const ChatWidget = () => {
+  const [openForm, setOpenForm] = useState(false)
   const [isOpen, setIsOpen] = useState(false);
   const widgetRef = useRef<HTMLDivElement>(null);
 
@@ -54,10 +56,9 @@ const ChatWidget = () => {
           duration-500
           ease-[cubic-bezier(0.22,1,0.36,1)]
 
-          ${
-            isOpen
-              ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-              : "pointer-events-none translate-y-5 scale-95 opacity-0"
+          ${isOpen
+            ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+            : "pointer-events-none translate-y-5 scale-95 opacity-0"
           }
         `}
       >
@@ -150,7 +151,7 @@ const ChatWidget = () => {
 
           {/* Email */}
           <a
-            href="mailto:enquiry@strapworld.com"
+            href="mailto:nalandaindustri@gmail.com"
             className="
               group flex items-center gap-3
               rounded-[12px]
@@ -179,7 +180,7 @@ const ChatWidget = () => {
               </p>
 
               <p className="truncate text-[12px] text-[#647077]">
-                sales@strapworld.com
+                nalandaindustri@gmail.com
               </p>
             </div>
 
@@ -245,6 +246,7 @@ const ChatWidget = () => {
             type="button"
             onClick={() => {
               setIsOpen(false);
+              setOpenForm(!openForm)
 
               document
                 .getElementById("enquiry")
@@ -337,6 +339,7 @@ const ChatWidget = () => {
           )}
         </span>
       </button>
+      <GetEnquiryForm isOpen={openForm} handleClose={() => setOpenForm(false)} />
     </div>
   );
 };

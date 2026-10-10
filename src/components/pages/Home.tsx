@@ -125,7 +125,7 @@ const Home = () => {
 
             <Blog data={blogs} />
 
-            <FAQ  data={faqData}/>
+            <FAQ data={faqData} />
 
             <FinalCTA data={finalCTA} />
         </div>

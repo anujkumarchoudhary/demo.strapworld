@@ -12,6 +12,6 @@ export const serviceSchema = (
   url,
 
   provider: {
-    "@id": "https://adaired.com/#organization",
+    "@id": "https://strap.com/#organization",
   },
 });

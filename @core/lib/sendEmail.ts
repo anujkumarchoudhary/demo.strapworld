@@ -9,7 +9,7 @@ interface SendEmailProps {
 export const sendEmail = async ({ to, subject, html }: SendEmailProps) => {
   try {
     await transporter.sendMail({
-      from: `"Adaired Digital Media" <${process.env.MAIL_USER}>`,
+      from: `"strap world " <${process.env.MAIL_USER}>`,
       to,
       subject,
       html,

@@ -1,21 +1,21 @@
 export const careerPageSchema = {
   "@type": "WebPage",
 
-  "@id": "https://adaired.com/career#webpage",
+  "@id": "https://strapworld.com/career#webpage",
 
-  url: "https://adaired.com/career",
+  url: "https://strapworld.com/career",
 
-  name: "Careers at Adaired Digital Media",
+  name: "Careers at strapworld Digital Media",
 
   description:
-    "Explore career opportunities at Adaired Digital Media. Join our team of SEO specialists, digital marketers, web developers, designers, content strategists, and growth marketers.",
+    "Explore career opportunities at strapworld Digital Media. Join our team of SEO specialists, digital marketers, web developers, designers, content strategists, and growth marketers.",
 
   isPartOf: {
-    "@id": "https://adaired.com/#website",
+    "@id": "https://strapworld.com/#website",
   },
 
   about: {
-    "@id": "https://adaired.com/#organization",
+    "@id": "https://strapworld.com/#organization",
   },
 
   inLanguage: "en-US",

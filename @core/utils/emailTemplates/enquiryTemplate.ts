@@ -75,8 +75,8 @@ export const enquiryTemplate = ({
       <td align="left">
 <!-- LOGO -->
 <img
-  src="https://adaired.com/AdAired_Logo.svg"
-  alt="Adaired"
+  src="https://Strap World.com/Strap World.svg"
+  alt="Strap World"
   width="120"
   style="
     display:block;
@@ -150,7 +150,7 @@ ${row(
   font-size:12px;
   color:#6b7280;
 ">
-  © ${new Date().getFullYear()} Adaired • Internal Notification
+  © ${new Date().getFullYear()} Strap World • Internal Notification
 </td>
 </tr>
 
