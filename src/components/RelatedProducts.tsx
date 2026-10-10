@@ -18,141 +18,116 @@ type Service = {
   icon: React.ElementType;
 };
 
+
 const RelatedProducts = ({ data }: any) => {
-  const { headingParts, label, list, description } = data || {};
   const { isDesktop } = useResponsive();
+
+  // Handle different API data structures
+  const source = data?.relatedProducts ?? data;
+
+  const relatedList = Array.isArray(source)
+    ? source
+    : Array.isArray(source?.list)
+      ? source.list
+      : source?.productId
+        ? [source]
+        : [];
+
+  // Extract the populated product
+  const products = relatedList
+    .map((item: any) => item?.productId ?? item)
+    .filter((product: any) => product && product.title);
+
   const {
     ref: productsRef,
     visibleItems,
-  } = useStaggerReveal(list?.length || 0, {
+  } = useStaggerReveal(products.length, {
     delay: 150,
     threshold: 0.15,
   });
 
   return (
-    <div 
-    style={{
-      background: data?.bgColor || "#063F3D",
-    }}
-    id="our-products" ref={productsRef} className=" py-10 sm:py-12 lg:py-16">
+    <section
+      id="our-products"
+      ref={productsRef}
+      style={{
+        background: source?.bgColor || "#063F3D",
+      }}
+      className="py-10 sm:py-12 lg:py-16"
+    >
+      <MaxWidth>
+        <Heading
+          as="h2"
+          isDart={true}
+          isCenter={!isDesktop}
+          isAccentLine={true}
+          label="Products"
+          labelColor="#39B972"
+          accentColor="#39B972"
+          textColor={source?.textColor || "#ffffff"}
+          isGradient={true}
+          headingParts={[{ text: "Related Products" }]}
+          description={"source?.description"}
+        />
 
-      <MaxWidth className=" ">
-        {/* ================= HEADER ================= */}
-        <div className="mb-12 grid lg:grid-cols-[45%_25%] justify-between">
-          {/* Left */}
-          <Heading
-            as="h2"
-            isDart={true}
-            isCenter={isDesktop ? false : true}
-            isAccentLine={true}
-            label={"Products"}
-            labelColor="#39B972"
-            accentColor="#39B972"
-            textColor={data?.textColor || "#ffffff"}
-            isGradient={true}
-            headingParts={[{text:"Related Products"}]}
-            description={description}
-          />
-          <div className="hidden lg:flex gap-2 justify-end h-fit mt-auto">
-            <ButtonLink  saveText={data?.button ?? "View all products"} btnColor="#063F3D" href={data?.href ?? "/content"} />
-
-          </div>
-        </div>
-
-        {/* ================= SERVICES ================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {list?.map((product: any, index: number) => {
-            const isCardVisible = visibleItems.includes(index);
-
-            return (
-              <div
-                key={product.title}
-                style={{
-                  transitionDelay: `${index * 50}ms`,
-                }}
-                className=
-                {`group
-    flex h-full flex-col
-    overflow-hidden
-    rounded-[10px]
-    bg-white
-    transition-all duration-300  ${isCardVisible
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-10 opacity-0"
-                  }`}
-
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mt-16">
+          {products.map((product: any) => (
+            <div
+              key={product._id ?? product.slug}
+              className="group flex h-full flex-col overflow-hidden rounded-[10px] bg-white transition-all duration-300"
+            >
+              {/* Image */}
+              <Link
+                href={product.slug}
+                className="relative block aspect-square w-full overflow-hidden"
               >
-                {/* image */}
-                <div className="relative w-full aspect-[16/9]">
-                  <Image
-                    src={product?.image}
-                    fill
-                    alt={product.title}
-                    className="rounded-tl-[10px] rounded-tr-[10px] object-cover   transition-transform
-              duration-500
-              ease-out
-              group-hover:scale-105"
+                <Image
+                  src={product.image}
+                  fill
+                  alt={product.title}
+                  className="rounded-tl-[10px] rounded-tr-[10px] object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                />
+              </Link>
+
+              {/* Content */}
+              <div className="relative flex min-h-[160px] flex-col p-6">
+                {/* Title */}
+                <Link
+                  href={product.slug}
+                  className="pr-12 text-[20px] font-semibold tracking-[-0.01em] text-[#16161D]"
+                >
+                  {product.title}
+                </Link>
+
+                {/* Arrow */}
+                <Link
+                  href={product.slug}
+                  aria-label={`View ${product.title}`}
+                  className="group absolute right-4 top-4"
+                >
+                  <MdArrowBack
+                    size={40}
+                    className="rotate-180 rounded-full bg-[#063F3D] p-2 text-[#39B972] transition-all duration-300 group-hover:translate-x-1"
                   />
-                </div>
+                </Link>
 
-                {/* Content */}
-                <div className="flex flex-1 flex-col w-full space-y-5 p-8">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-center font-semibold tracking-[-0.01em] text-[#16161D] lg:text-left">
-                      {product?.title}
-                    </h3>
-
-                    <p className="text-[clamp(10px,4vw,26px)] font-bold text-[#218B55]/60">
-                      0{index + 1}
-                    </p>
-                  </div>
-
-                  <p className="text-[#000000]/80 text-left">
-                    {product.description}
-                  </p>
-
-                  <div className="flex mt-auto  items-end justify-between gap-4">
-                    {/* Labels */}
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      {product?.labels?.map((item: string, idx: number) => (
-                        <React.Fragment key={idx}>
-                          {idx > 0 && (
-                            <span className="text-[10px] text-[#A0A8AD]">
-                              •
-                            </span>
-                          )}
-
-                          <p className="text-[clamp(9px,0.75vw,10px)] font-semibold uppercase text-[#647077]">
-                            {item}
-                          </p>
-                        </React.Fragment>
-                      ))}
-                    </div>
-
-                    {/* View */}
-                    <Link
-                      href={product?.href}
-                      className="mt-auto flex h-fit cursor-pointer items-center justify-end gap-2 shrink-0"
-                    >
-                      <p className="my-auto text-[clamp(12px,1vw,14px)] font-bold text-[#101820]">
-                        {product.button}
-                      </p>
-
-                      <MdArrowBack
-                        className="my-auto rotate-180 text-[#39B972] transition-all duration-300 group-hover:translate-x-1"
-                      />
-                    </Link>
-                  </div>
-                </div>
+                {/* Description */}
+                <p className="mt-auto pt-6 text-left text-[16px] text-black/80">
+                  {product.description?.slice(0, 50)}
+                  {product.description?.length > 50 ? "..." : ""}
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
-        <div className="flex lg:hidden gap-2 pt-10  justify-center h-fit mt-auto">
-            <ButtonLink  saveText={data?.button ?? "View all products"} btnColor="#063F3D" href={data?.href ?? "/content"} />
-        </div>
+
+        {products.length === 0 && (
+          <p className="mt-8 text-center text-white">
+            No related products found.
+          </p>
+        )}
       </MaxWidth>
-    </div>
+    </section>
   );
 };
 
