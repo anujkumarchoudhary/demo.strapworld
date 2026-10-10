@@ -39,7 +39,7 @@ export type DynamicTableProps<T> = {
 
 export type IBlogColumn = {
   _id: string;
-  postTitle: string;
+  title: string;
   slug: string;
   createdAt: string;
   category?: {

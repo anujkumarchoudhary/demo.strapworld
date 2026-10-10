@@ -2,20 +2,30 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
 import axios from "axios";
 import toast from "react-hot-toast";
-import { socket } from "@/@core/lib/socket";
 import { BaseUrl } from "@/src/app/baseurl";
 import InputField from "@/src/components/ui/InputField";
 import SelectField from "@/src/components/ui/SelectField";
 import ImageUpload from "@/src/components/ui/ImageUpload";
 import QuillEditor from "@/src/components/QuillEditor";
-
+import SaveAndCancel from "@/src/components/common/SaveAndCancel";
 
 interface CategoryType {
   label: string;
   value: string;
+}
+
+interface BlogForm {
+  title: string;
+  slug: string;
+  category: string;
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    keywords: string;
+    focusKeyword: string;
+  };
 }
 
 const CreateBlog = ({ refresh }: any) => {
@@ -23,13 +33,15 @@ const CreateBlog = ({ refresh }: any) => {
   const router = useRouter();
   const params = useParams();
   const blogId = params?.slug;
-  const isEditMode = blogId !== "create";
+  const isEditMode = Boolean(blogId && blogId !== "create");
+
   const [categoryOptions, setCategoryOptions] = useState<CategoryType[]>([]);
   const [content, setContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [blog, setBlog] = useState<any>(null);
-  const [inputVal, setInputVal] = useState({
-    postTitle: "",
+
+  const [inputVal, setInputVal] = useState<BlogForm>({
+    title: "",
     slug: "",
     category: "",
     seo: {
@@ -40,16 +52,24 @@ const CreateBlog = ({ refresh }: any) => {
     },
   });
 
-  /* =============================
-     Handle Normal + Nested Fields
-  ============================== */
+  // Generate slug from title
+  const generateSlug = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  // Handle normal and nested fields
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
     if (name.startsWith("seo.")) {
-      const key = name.split(".")[1];
+      const key = name.split(".")[1] as keyof BlogForm["seo"];
 
       setInputVal((prev) => ({
         ...prev,
@@ -66,50 +86,28 @@ const CreateBlog = ({ refresh }: any) => {
     }
   };
 
-  /* =============================
-     Auto Slug Generate
-  ============================== */
-  const generateSlug = (text: string) => {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9 ]/g, "")
-      .replace(/\s+/g, "-");
-  };
-
+  // Auto-generate slug from title
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
     setInputVal((prev) => ({
       ...prev,
-      postTitle: value,
+      title: value,
       slug: generateSlug(value),
     }));
   };
 
-  /* =============================
-     Image Upload
-  ============================== */
+  // Image upload
   const handleImageUpload = (file: File) => {
     setSelectedFile(file);
   };
 
-  /* =============================
-     Submit Blog
-  ============================== */
+  // Submit blog
   const handleSubmit = async () => {
-    const { postTitle, slug, category, seo } = inputVal;
+    const { title, slug, category, seo } = inputVal;
 
-    const token = localStorage.getItem("token"); // or wherever you store it
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    };
-    // ✅ Required validation
     if (
-      !postTitle.trim() ||
+      !title.trim() ||
       !slug.trim() ||
       !category ||
       !content.trim() ||
@@ -121,103 +119,150 @@ const CreateBlog = ({ refresh }: any) => {
       toast.error("All fields are required");
       return;
     }
+
+    if (!isEditMode && !selectedFile) {
+      toast.error("Please upload a blog image");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      toast.error("Please log in again");
+      return;
+    }
+
+    const formData = new FormData();
+
+    // Backend fields
+    formData.append("title", title.trim());
+    formData.append("slug", slug);
+    formData.append("description", content);
+
+    // Map existing SEO form fields to backend metaDetails
+    formData.append(
+      "metaDetails",
+      JSON.stringify({
+        title: seo.metaTitle.trim(),
+        description: seo.metaDescription.trim(),
+        keywords: seo.keywords
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean),
+        canonical: "",
+        index: true,
+        focusKeyword: seo.focusKeyword.trim(),
+      })
+    );
+
+    if (selectedFile) {
+      formData.append("image", selectedFile);
+    }
+
     try {
       setLoading(true);
-      const formData = new FormData();
 
-      formData.append("postTitle", inputVal.postTitle);
-      formData.append("slug", inputVal.slug);
-      formData.append("category", inputVal?.category);
-      formData.append("postDescription", content);
-      formData.append("seo", JSON.stringify(inputVal.seo));
-
-      if (selectedFile) {
-        formData.append("image", selectedFile);
-      }
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
       if (isEditMode) {
-        await axios.patch(`${BaseUrl}blog/update/${blogId}`, formData, config);
+        await axios.patch(
+          `${BaseUrl}/blogs/update/${blogId}`,
+          formData,
+          config
+        );
+
         toast.success("Blog updated successfully");
-        setLoading(false);
-        router.push("/admin/blog");
       } else {
-        await axios.post(`${BaseUrl}blog`, formData, config);
+        await axios.post(`${BaseUrl}/blogs`, formData, config);
+
         toast.success("Blog created successfully");
-        setLoading(false);
-        router.push("/admin/blog");
       }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Something went wrong");
-      console.log(err.response?.data || err.message);
+
+      refresh?.();
+      router.push("/admin/blog");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(
+          err.response?.data?.message || "Something went wrong"
+        );
+        console.error(err.response?.data || err.message);
+      } else {
+        toast.error("Something went wrong");
+        console.error(err);
+      }
     } finally {
       setLoading(false);
-      socket.emit("new_blog");
-      refresh();
     }
   };
-  /* =============================
-     Fetch Categories
-  ============================== */
+
+  // Fetch categories (existing UI retained)
   const getCategories = async () => {
     try {
-      const res = await axios.get(`${BaseUrl}category`);
+      const res = await axios.get(`${BaseUrl}/categories`);
 
       if (res.status === 200) {
-        const formatted = res.data?.data?.map((item: any) => ({
-          label: item?.name,
-          value: item?._id,
-        }));
-
-        setCategoryOptions(formatted);
+        setCategoryOptions(res.data?.data ?? []);
       }
     } catch (err) {
-      console.log(err);
+      console.error("Failed to fetch categories:", err);
     }
   };
 
+  // Fetch single blog for editing
   const getSingleBlog = async () => {
     try {
-      const res = await axios.get(`${BaseUrl}blog/${blogId}`);
+      const res = await axios.get(`${BaseUrl}/blogs/slug/${blogId}`);
 
       if (res.status === 200) {
-        const blogData = res?.data?.data;
+        const blogData = res.data?.data;
+
         setBlog(blogData);
+
         setInputVal({
-          postTitle: blogData.postTitle,
-          slug: blogData.slug,
-          category: blogData.category,
-          seo: blogData.seo || {
-            metaTitle: "",
-            metaDescription: "",
-            keywords: "",
-            focusKeyword: "",
+          title: blogData.title ?? "",
+          slug: blogData.slug ?? "",
+          category: blogData.category ?? "",
+          seo: {
+            metaTitle: blogData.metaDetails?.title ?? "",
+            metaDescription: blogData.metaDetails?.description ?? "",
+            keywords: Array.isArray(blogData.metaDetails?.keywords)
+              ? blogData.metaDetails.keywords.join(", ")
+              : "",
+            focusKeyword: blogData.metaDetails?.focusKeyword ?? "",
           },
         });
 
-        setContent(blogData.postDescription);
+        setContent(blogData.description ?? "");
       }
     } catch (err) {
-      console.log(err);
+      console.error("Failed to fetch blog:", err);
+      toast.error("Failed to load blog");
     }
   };
+
   useEffect(() => {
-    getCategories();
+    void getCategories();
+
     if (isEditMode) {
-      getSingleBlog();
+      void getSingleBlog();
     }
-  }, []);
+  }, [blogId]);
 
   return (
-    <div className="p-10 m-5 space-y-6 bg-white rounded-lg shadow ">
+    <div className="p-10 m-5 space-y-6 bg-white rounded-lg shadow">
       <h3>{isEditMode ? "Update" : "Create"} Blog</h3>
 
       <div className="grid grid-cols-4 gap-6">
         <div className="col-span-3 space-y-4">
           <InputField
             label="Title"
-            name="postTitle"
+            name="title"
             placeholder="Enter Heading"
-            value={inputVal.postTitle}
+            value={inputVal.title}
             handleChange={handleTitleChange}
             required={true}
           />
@@ -243,18 +288,19 @@ const CreateBlog = ({ refresh }: any) => {
           </div>
         </div>
 
-        {/* <ImageUpload onUpload={handleImageUpload} /> */}
         <ImageUpload
-          existingImage={blog?.featuredImage ?? blog?.seo?.openGraph?.image}
+          existingImage={
+            blog?.image ??
+            blog?.featuredImage ??
+            blog?.seo?.openGraph?.image
+          }
           onUpload={handleImageUpload}
         />
       </div>
 
-      {/* <Editor content={content} setContent={setContent} /> */}
       <QuillEditor value={content} onChange={setContent} />
-      {/* =============================
-          SEO Section
-      ============================== */}
+
+      {/* SEO Section — existing UI retained */}
       <div className="space-y-4">
         <p className="font-semibold">Meta Tags</p>
 
@@ -298,17 +344,12 @@ const CreateBlog = ({ refresh }: any) => {
       </div>
 
       <div className="flex justify-end gap-2">
-        {/* <SaveAndCancel
-          // handleClick={handleSubmit}
-          isBgWhite={true}
-          isBorder={true}
-          name={"Draft"}
-        /> */}
-        {/* <SaveAndCancel
-          isPlus={true}
+        <SaveAndCancel
+          saveText={loading ? "Saving..." : "Submit"}
           handleClick={handleSubmit}
-          name={isEditMode ? "Update" : "Add"}
-        /> */}
+          cancelText="Cancel"
+          cancelTextColor="#000000"
+        />
       </div>
     </div>
   );

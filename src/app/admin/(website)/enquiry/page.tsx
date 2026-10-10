@@ -44,7 +44,7 @@ const Page = () => {
         },
       };
 
-      const res = await axios.get(`${BaseUrl}/enquiry`, config);
+      const res = await axios.get(`${BaseUrl}/enquiries`, config);
       console.log("🚀 ~ file: page.tsx:50 ~ getBlogs ~ res:", res);
       if (res?.status === 200) {
         const blogsArray = Array.isArray(res.data)

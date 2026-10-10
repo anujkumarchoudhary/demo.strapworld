@@ -1,140 +1,132 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-
 import Blog from "../model/blog.model";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary";
-import cloudinary from "../config/cloudinary";
 
-type UploadedFile = Express.Multer.File;
-
-type UploadedImage = {
-  secure_url: string;
-  public_id: string;
-};
-
-const parseJSON = <T>(value: unknown, fallback: T): T => {
-  if (value === undefined || value === null || value === "") {
-    return fallback;
-  }
-
-  if (typeof value !== "string") {
-    return value as T;
-  }
-
-  return JSON.parse(value) as T;
-};
-
-const sanitizeFilename = (filename: string) => {
-  return filename
-    .replace(/\.[^/.]+$/, "")
-    .replace(/[^a-zA-Z0-9_-]/g, "-")
-    .toLowerCase();
-};
-
-const uploadImage = async (
-  file: UploadedFile,
-  folder: string,
-): Promise<UploadedImage> => {
-  return uploadToCloudinary(
-    file.buffer,
-    folder,
-    sanitizeFilename(file.originalname),
-  );
-};
-
-// CREATE BLOG
-
-// Generate slug from title
-const generateSlug = (title: string): string => {
-  return title
+// Generate a URL-friendly slug.
+const generateSlug = (title: string): string =>
+  title
     .toLowerCase()
     .trim()
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+// Generate a unique slug, excluding the current blog during updates.
+const getUniqueSlug = async (
+  title: string,
+  excludeId?: string,
+): Promise<string> => {
+  const baseSlug = generateSlug(title);
+
+  if (!baseSlug) {
+    throw new Error("A valid title is required to generate a slug.");
+  }
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (
+    await Blog.exists({
+      slug,
+      ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+    })
+  ) {
+    slug = `${baseSlug}-${counter++}`;
+  }
+
+  return slug;
 };
 
+// Parse SEO metadata from JSON or an object.
+const parseMetaDetails = (value: unknown) => {
+  const parsed = typeof value === "string" ? JSON.parse(value) : value;
+
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Invalid metaDetails format.");
+  }
+
+  const meta = parsed as Record<string, unknown>;
+
+  const keywords = Array.isArray(meta.keywords)
+    ? meta.keywords
+        .map(String)
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : typeof meta.keywords === "string"
+      ? meta.keywords
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+      : [];
+
+  return {
+    title: String(meta.title ?? "").trim(),
+    description: String(meta.description ?? "").trim(),
+    keywords,
+    canonical: String(meta.canonical ?? "").trim(),
+    index:
+      meta.index === undefined
+        ? true
+        : meta.index === true || meta.index === "true",
+  };
+};
+
+// CREATE BLOG
 export const createBlog = async (req: Request, res: Response) => {
   try {
-    const {
-      title,
-      content,
-      excerpt,
-      author,
-      category,
-      tags,
-      status,
-      seoTitle,
-      seoDescription,
-      seoKeywords,
-      canonical,
-      index,
-    } = req.body;
+    const title = String(req.body.title ?? "").trim();
+    const description = String(req.body.description ?? "").trim();
 
-    if (!title?.trim()) {
+    if (!title || !description) {
       return res.status(400).json({
         success: false,
-        message: "Blog title is required",
+        message: "Title and description are required.",
       });
     }
 
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Blog image is required",
+        message: "Blog image is required.",
       });
     }
 
-    // Generate slug from title; do not accept slug from request body
-    const baseSlug = generateSlug(title);
+    let metaDetails;
 
-    if (!baseSlug) {
+    try {
+      metaDetails = parseMetaDetails(req.body.metaDetails);
+    } catch {
       return res.status(400).json({
         success: false,
-        message: "A valid title is required to generate the slug",
+        message: "Invalid metaDetails JSON.",
       });
     }
 
-    // Ensure slug is unique
-    let slug = baseSlug;
-    let counter = 1;
-
-    while (await Blog.exists({ slug })) {
-      slug = `${baseSlug}-${counter}`;
-      counter++;
+    if (!metaDetails.title || !metaDetails.description) {
+      return res.status(400).json({
+        success: false,
+        message: "Meta title and meta description are required.",
+      });
     }
 
-    // Upload image to Cloudinary
+    const slug = await getUniqueSlug(title);
+
     const uploadedImage = await uploadToCloudinary(
       req.file.buffer,
       "blogs",
       req.file.originalname,
     );
 
-    // Create metadata object
-    const metaDetails = {
-      title: seoTitle?.trim() || title.trim(),
-      description: seoDescription?.trim() || excerpt?.trim() || "",
-      keywords: Array.isArray(seoKeywords)
-        ? seoKeywords
-        : (seoKeywords || "")
-            .split(",")
-            .map((keyword: string) => keyword.trim())
-            .filter(Boolean),
-      canonical: canonical?.trim() || "",
-      index: index === undefined ? true : index === true || index === "true",
-    };
+    if (!uploadedImage?.secure_url) {
+      throw new Error("Failed to upload blog image.");
+    }
 
     const blog = await Blog.create({
-      title: title.trim(),
+      title,
       slug,
-      content,
-      excerpt,
-      author,
-      category,
-      tags,
-      status: status || "draft",
+      description,
       image: uploadedImage.secure_url,
       imagePublicId: uploadedImage.public_id,
       metaDetails,
@@ -142,98 +134,51 @@ export const createBlog = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       success: true,
-      message: "Blog created successfully",
+      message: "Blog created successfully.",
       data: blog,
     });
-  } catch (error: any) {
-    console.error("Create blog error:", error);
-
-    // MongoDB duplicate-key error
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: "A blog with this slug already exists",
-      });
-    }
+  } catch (error: unknown) {
+    console.error("CREATE BLOG ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Failed to create blog",
+      message:
+        error instanceof Error ? error.message : "Failed to create blog.",
     });
   }
 };
 
 // GET ALL BLOGS
-export const getBlogs = async (req: Request, res: Response) => {
+export const getAllBlogs = async (req: Request, res: Response) => {
   try {
-    const page = Math.max(
-      1,
-      Number.parseInt(String(req.query.page || "1"), 10) || 1,
-    );
-
-    const limit = Math.min(
-      100,
-      Math.max(1, Number.parseInt(String(req.query.limit || "10"), 10) || 10),
-    );
-
-    const filter: Record<string, any> = {
-      status: "published",
-    };
-
-    if (req.query.status === "draft" || req.query.status === "published") {
-      // Only enable draft access on an authenticated admin route.
-      filter.status = req.query.status;
-    }
-
-    if (req.query.category) {
-      filter.category = req.query.category;
-    }
-
-    const [blogs, total] = await Promise.all([
-      Blog.find(filter)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean(),
-
-      Blog.countDocuments(filter),
-    ]);
+    const blogs = await Blog.find().sort({ createdAt: -1 }).lean();
 
     return res.status(200).json({
       success: true,
+      count: blogs.length,
       data: blogs,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
     });
-  } catch (error: any) {
-    console.error("Get blogs error:", error);
+  } catch (error: unknown) {
+    console.error("GET ALL BLOGS ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Failed to fetch blogs",
+      message: "Failed to fetch blogs.",
     });
   }
 };
 
-// GET SINGLE BLOG BY ID OR SLUG
-export const getBlogById = async (req: Request, res: Response) => {
+// GET SINGLE BLOG BY SLUG
+export const getBlogBySlug = async (req: Request, res: Response) => {
   try {
-    const identifier = String(req.params.identifier);
+    const { slug } = req.params;
 
-    const filter = mongoose.isValidObjectId(identifier)
-      ? { _id: identifier }
-      : { slug: identifier.toLowerCase() };
-
-    const blog = await Blog.findOne(filter);
+    const blog = await Blog.findOne({ slug }).lean();
 
     if (!blog) {
       return res.status(404).json({
         success: false,
-        message: "Blog not found",
+        message: "Blog not found.",
       });
     }
 
@@ -241,27 +186,24 @@ export const getBlogById = async (req: Request, res: Response) => {
       success: true,
       data: blog,
     });
-  } catch (error: any) {
-    console.error("Get blog error:", error);
+  } catch (error: unknown) {
+    console.error("GET BLOG BY SLUG ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Failed to fetch blog",
+      message: "Failed to fetch blog.",
     });
   }
 };
 
 // UPDATE BLOG
 export const updateBlog = async (req: Request, res: Response) => {
-  let uploadedPublicId: string | undefined;
-
   try {
-    const { id } = req.params;
-
+    const id = String(req.params.id);
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid blog ID",
+        message: "Invalid blog ID.",
       });
     }
 
@@ -270,136 +212,90 @@ export const updateBlog = async (req: Request, res: Response) => {
     if (!blog) {
       return res.status(404).json({
         success: false,
-        message: "Blog not found",
+        message: "Blog not found.",
       });
     }
 
-    const updates: Record<string, any> = {};
+    if (req.body.title !== undefined) {
+      const title = String(req.body.title).trim();
 
-    const stringFields = [
-      "title",
-      "excerpt",
-      "content",
-      "author",
-      "category",
-      "seoTitle",
-      "seoDescription",
-    ];
-
-    for (const field of stringFields) {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
-    }
-
-    if (req.body.slug !== undefined) {
-      const slug = String(req.body.slug).trim().toLowerCase();
-
-      const existing = await Blog.findOne({
-        slug,
-        _id: { $ne: id },
-      });
-
-      if (existing) {
-        return res.status(409).json({
-          success: false,
-          message: "A blog with this slug already exists",
-        });
-      }
-
-      updates.slug = slug;
-    }
-
-    if (req.body.tags !== undefined) {
-      updates.tags = parseJSON<string[]>(req.body.tags, []);
-    }
-
-    if (req.body.seoKeywords !== undefined) {
-      updates.seoKeywords = parseJSON<string[]>(req.body.seoKeywords, []);
-    }
-
-    if (req.body.status !== undefined) {
-      if (!["draft", "published"].includes(req.body.status)) {
+      if (!title) {
         return res.status(400).json({
           success: false,
-          message: "Status must be draft or published",
+          message: "Title cannot be empty.",
         });
       }
 
-      updates.status = req.body.status;
-
-      if (req.body.status === "published") {
-        updates.publishedAt = blog.publishedAt || new Date();
-      }
-    }
-
-    // Replace image only if a new image is provided.
-    const mainImage = (
-      req.files as {
-        [fieldname: string]: UploadedFile[];
-      }
-    )?.image?.[0];
-
-    if (mainImage) {
-      const uploadedImage = await uploadImage(mainImage, "strapworld/blogs");
-
-      uploadedPublicId = uploadedImage.public_id;
-
-      updates.image = uploadedImage.secure_url;
-      updates.imagePublicId = uploadedImage.public_id;
-    }
-
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      id,
-      { $set: updates },
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
-
-    if (!updatedBlog) {
-      if (uploadedPublicId) {
-        await cloudinary.uploader.destroy(uploadedPublicId);
+      if (title !== blog.title) {
+        blog.slug = await getUniqueSlug(title, id);
       }
 
-      return res.status(404).json({
-        success: false,
-        message: "Blog not found",
-      });
+      blog.title = title;
     }
 
-    // Remove the previous image after a successful update.
-    if (mainImage && blog.imagePublicId) {
+    if (req.body.description !== undefined) {
+      const description = String(req.body.description).trim();
+
+      if (!description) {
+        return res.status(400).json({
+          success: false,
+          message: "Description cannot be empty.",
+        });
+      }
+
+      blog.description = description;
+    }
+
+    if (req.body.metaDetails !== undefined) {
       try {
-        await cloudinary.uploader.destroy(blog.imagePublicId);
-      } catch (cleanupError) {
-        console.error("Old image cleanup error:", cleanupError);
+        const metaDetails = parseMetaDetails(req.body.metaDetails);
+
+        if (!metaDetails.title || !metaDetails.description) {
+          return res.status(400).json({
+            success: false,
+            message: "Meta title and meta description are required.",
+          });
+        }
+
+        blog.metaDetails = metaDetails as typeof blog.metaDetails;
+      } catch {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid metaDetails JSON.",
+        });
       }
     }
+
+    // Replace the image only when a new one is uploaded.
+    if (req.file) {
+      const uploadedImage = await uploadToCloudinary(
+        req.file.buffer,
+        "blogs",
+        req.file.originalname,
+      );
+
+      if (!uploadedImage?.secure_url) {
+        throw new Error("Failed to upload replacement image.");
+      }
+
+      blog.image = uploadedImage.secure_url;
+      blog.imagePublicId = uploadedImage.public_id;
+    }
+
+    await blog.save();
 
     return res.status(200).json({
       success: true,
-      message: "Blog updated successfully",
-      data: updatedBlog,
+      message: "Blog updated successfully.",
+      data: blog,
     });
-  } catch (error: any) {
-    console.error("Update blog error:", error);
+  } catch (error: unknown) {
+    console.error("UPDATE BLOG ERROR:", error);
 
-    if (uploadedPublicId) {
-      try {
-        await cloudinary.uploader.destroy(uploadedPublicId);
-      } catch (cleanupError) {
-        console.error("Cloudinary cleanup error:", cleanupError);
-      }
-    }
-
-    return res.status(error?.code === 11000 ? 409 : 500).json({
+    return res.status(500).json({
       success: false,
       message:
-        error?.code === 11000
-          ? "A blog with this slug already exists"
-          : error.message || "Failed to update blog",
+        error instanceof Error ? error.message : "Failed to update blog.",
     });
   }
 };
@@ -412,7 +308,7 @@ export const deleteBlog = async (req: Request, res: Response) => {
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid blog ID",
+        message: "Invalid blog ID.",
       });
     }
 
@@ -421,29 +317,24 @@ export const deleteBlog = async (req: Request, res: Response) => {
     if (!blog) {
       return res.status(404).json({
         success: false,
-        message: "Blog not found",
+        message: "Blog not found.",
       });
-    }
-
-    if (blog.imagePublicId) {
-      try {
-        await cloudinary.uploader.destroy(blog.imagePublicId);
-      } catch (cleanupError) {
-        console.error("Cloudinary deletion error:", cleanupError);
-      }
     }
 
     return res.status(200).json({
       success: true,
-      message: "Blog deleted successfully",
-      data: blog,
+      message: "Blog deleted successfully.",
+      data: {
+        id: blog._id,
+        title: blog.title,
+      },
     });
-  } catch (error: any) {
-    console.error("Delete blog error:", error);
+  } catch (error: unknown) {
+    console.error("DELETE BLOG ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: error.message || "Failed to delete blog",
+      message: "Failed to delete blog.",
     });
   }
 };

@@ -1,24 +1,36 @@
 import { Router } from "express";
+import multer from "multer";
 
-import upload from "../middleware/upload.middleware";
 import {
   createBlog,
-  getBlogs,
-  getBlogById,
+  getAllBlogs,
+  getBlogBySlug,
   updateBlog,
   deleteBlog,
 } from "../controllers/blog.controller";
 
 const router = Router();
 
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
+// Create
 router.post("/", upload.single("image"), createBlog);
 
-router.get("/", getBlogs);
+// Get all
+router.get("/", getAllBlogs);
 
-router.get("/:identifier", getBlogById);
+// Get one by slug
+router.get("/slug/:slug", getBlogBySlug);
 
-router.put("/:id", upload.single("image"), updateBlog);
+// Update
+router.patch("/update/:id", upload.single("image"), updateBlog);
 
+// Delete
 router.delete("/:id", deleteBlog);
 
 export default router;

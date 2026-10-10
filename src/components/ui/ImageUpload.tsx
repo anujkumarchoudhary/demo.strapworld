@@ -1,8 +1,6 @@
 "use client";
 
-// import { blogImageBaseUrl } from "@/app/baseUrl";
 import Image from "next/image";
-
 import { useRef, useState, useEffect } from "react";
 
 export default function ImageUpload({
@@ -13,13 +11,13 @@ export default function ImageUpload({
   existingImage?: string;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(
+    existingImage || null
+  );
 
-  // ✅ Prefill image in edit mode
+  // Prefill image in edit mode
   useEffect(() => {
-    if (existingImage) {
-      setPreview(existingImage);
-    }
+    setPreview(existingImage || null);
   }, [existingImage]);
 
   const handleClick = () => {
@@ -28,31 +26,36 @@ export default function ImageUpload({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
     const imageUrl = URL.createObjectURL(file);
 
-    setPreview(imageUrl); // show new preview
-    onUpload(file); // send file to parent
+    setPreview((previousPreview) => {
+      if (previousPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(previousPreview);
+      }
+
+      return imageUrl;
+    });
+
+    onUpload(file);
   };
 
-  // ✅ Cleanup only for blob URLs
+  // Clean up temporary image URLs
   useEffect(() => {
     return () => {
-      if (preview && preview.startsWith("blob:")) {
+      if (preview?.startsWith("blob:")) {
         URL.revokeObjectURL(preview);
       }
     };
   }, [preview]);
 
-  const imageSrc = preview
-    ? preview.startsWith("blob:")
-      ? preview
-      : `${"blogImageBaseUrl"}${preview}`
-    : null;
+  // Cloudinary URL is already complete; don't prepend a base URL.
+  const imageSrc = preview;
 
   return (
-    <div className="relative bg-[#F8F8F8] rounded-xl p-4">
+    <div className="relative rounded-xl bg-[#F8F8F8] p-4">
       <input
         type="file"
         accept="image/*"
@@ -63,18 +66,19 @@ export default function ImageUpload({
 
       <div
         onClick={handleClick}
-        className="relative cursor-pointer h-40 w-full border-2 border-dashed border-gray-400 rounded-xl flex items-center justify-center hover:border-black transition overflow-hidden"
+        className="relative flex h-40 w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-400 transition hover:border-black"
       >
-        {preview ? (
+        {imageSrc ? (
           <Image
-            src={imageSrc ?? ""}
-            alt="Preview"
+            src={imageSrc}
+            alt="Blog image preview"
             fill
-            className="object-cover"
             unoptimized
+            className="object-cover"
+            sizes="100vw"
           />
         ) : (
-          <span className="text-gray-500 text-sm">Upload</span>
+          <span className="text-sm text-gray-500">Upload</span>
         )}
       </div>
     </div>

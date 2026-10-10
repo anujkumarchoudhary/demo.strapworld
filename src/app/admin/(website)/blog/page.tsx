@@ -59,7 +59,7 @@ const Page = () => {
   const getBlogs = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${BaseUrl}/blog`);
+      const res = await axios.get(`${BaseUrl}/blogs`);
 
       if (res?.status === 200) {
         const blogsArray = Array.isArray(res.data)
@@ -100,7 +100,7 @@ const Page = () => {
           "Content-Type": "multipart/form-data",
         },
       };
-      const res = await axios.delete(`${BaseUrl}/blog/delete/${id}`, config);
+      const res = await axios.delete(`${BaseUrl}/blogs/${id}`, config);
 
       if (res?.status === 200) {
         setData((prev: any) => prev.filter((blog: any) => blog._id !== id));
@@ -113,7 +113,7 @@ const Page = () => {
   };
 
   const columns: Column<IBlogColumn>[] = [
-    { key: "postTitle", label: "Title", width: "55%" },
+    { key: "title", label: "Title", width: "55%" },
     {
       key: "category",
       label: "Category",

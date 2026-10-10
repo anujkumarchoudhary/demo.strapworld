@@ -7,6 +7,7 @@ import { connectDB } from "./backend/config/database";
 import authRoutes from "./backend/routes/user.routes";
 import productRoutes from "./backend/routes/product.routes";
 import blogRoutes from "./backend/routes/blog.routes";
+import categoriesRoutes from "./backend/routes/category.routes";
 import enquirieRoutes from "./backend/routes/enquiry.routes";
 // import errorMiddleware from "./server/middleware/error.middleware";
 
@@ -57,6 +58,7 @@ const startServer = async () => {
     app.use(`${Base}auth`, authRoutes);
     app.use(`${Base}products`, productRoutes);
     app.use(`${Base}blogs`, blogRoutes);
+    app.use(`${Base}categories`, categoriesRoutes);
     app.use(`${Base}enquiries`, enquirieRoutes);
 
     // =========================

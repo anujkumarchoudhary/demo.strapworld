@@ -53,9 +53,9 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const endpoint = isSignup ? "signup" : "login";
+      const endpoint = isSignup ? "register" : "login";
 
-      const res = await fetch(`${BaseUrl}auth/${endpoint}`, {
+      const res = await fetch(`${BaseUrl}/auth/${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

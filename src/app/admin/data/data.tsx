@@ -43,14 +43,9 @@ export const menuData = [
   { label: "Redirects", path: "/admin/redirect", icon: <GoArrowSwitch size={20} /> },
 
   {
-    label: "Service Meta",
-    path: "/admin/service-meta",
+    label: "Products Meta",
+    path: "/admin/products-meta",
     icon: <FaServicestack size={20} />,
-  },
-  {
-    label: "Case Study",
-    path: "/admin/case-study",
-    icon: <HiClipboardDocument size={20} />,
   },
   {
     label: "Category",

@@ -1,18 +1,11 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IBlog extends Document {
   title: string;
   slug: string;
-  excerpt?: string;
-  content: string;
-  author?: string;
-  category?: string;
-  tags: string[];
+  description: string;
   image: string;
   imagePublicId?: string;
-  status: "draft" | "published";
-  publishedAt?: Date;
-
   metaDetails: {
     title: string;
     description: string;
@@ -20,9 +13,6 @@ export interface IBlog extends Document {
     canonical: string;
     index: boolean;
   };
-
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 const BlogSchema = new Schema<IBlog>(
@@ -32,96 +22,50 @@ const BlogSchema = new Schema<IBlog>(
       required: true,
       trim: true,
     },
-
     slug: {
       type: String,
       required: true,
       unique: true,
       trim: true,
-      lowercase: true,
     },
-
-    excerpt: {
-      type: String,
-      default: "",
-      trim: true,
-    },
-
-    content: {
+    description: {
       type: String,
       required: true,
     },
-
-    author: {
-      type: String,
-      default: "Admin",
-      trim: true,
-    },
-
-    category: {
-      type: String,
-      default: "",
-      trim: true,
-    },
-
-    tags: {
-      type: [String],
-      default: [],
-    },
-
     image: {
       type: String,
       required: true,
     },
-
     imagePublicId: {
       type: String,
       default: "",
     },
-
-    status: {
-      type: String,
-      enum: ["draft", "published"],
-      default: "draft",
-    },
-
-    publishedAt: {
-      type: Date,
-    },
-
     metaDetails: {
       title: {
         type: String,
-        default: "",
+        required: true,
         trim: true,
       },
-
       description: {
         type: String,
-        default: "",
+        required: true,
         trim: true,
       },
-
       keywords: {
         type: [String],
         default: [],
       },
-
       canonical: {
         type: String,
         default: "",
-        trim: true,
       },
-
       index: {
         type: Boolean,
         default: true,
       },
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true }
 );
 
 export default mongoose.models.Blog ||

@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
-
-import { BaseURL } from "@/app/baseUrl";
-
 import axios from "axios";
 import toast from "react-hot-toast";
 
-import QuillEditor from "@/app/components/QuillEditor";
-import DynamicTable from "@/app/components/table/DynamicTable";
 import { Category, Column } from "@/@core/types/table.type";
+import { BaseUrl } from "@/src/app/baseurl";
+import DynamicTable from "@/src/components/table/DynamicTable";
+import QuillEditor from "@/src/components/QuillEditor";
 
 const Page = () => {
   const [data, setData] = useState<Category[]>([]);
@@ -32,7 +30,7 @@ const Page = () => {
   const getCategories = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${BaseURL}/category`);
+      const res = await axios.get(`${BaseUrl}/categories`);
       setData(res?.data?.data || []);
     } catch (error) {
       toast.error("Failed to fetch categories");
@@ -76,7 +74,7 @@ const Page = () => {
       return toast.error("Category name required");
     }
     try {
-      const res = await axios.post(`${BaseURL}/category`, formData);
+      const res = await axios.post(`${BaseUrl}/category`, formData);
       if (res?.data?.success) {
         toast.success("Category created");
         setOpenModal(false);
@@ -93,7 +91,7 @@ const Page = () => {
 
   const deleteCategory = async (id: string) => {
     try {
-      const res = await axios.delete(`${BaseURL}/category/delete/${id}`);
+      const res = await axios.delete(`${BaseUrl}/category/delete/${id}`);
       if (res?.data?.success) {
         toast.success("Category deleted");
       }
